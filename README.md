@@ -1,2 +1,2 @@
 # Quizy
-È un'applicazione che permette agli utenti di partecipare con quiz a scelta multipla.
+È un'applicazione che permette agli utenti di partecipare a quiz a scelta multipla.
