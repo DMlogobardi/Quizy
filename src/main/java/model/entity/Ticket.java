@@ -10,6 +10,10 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "ticket")
+@NamedQueries({
+        @NamedQuery(name = "Ticket.findAll", query = "SELECT t FROM Ticket t"),
+        @NamedQuery(name = "Ticket.faindAllByUtente", query = "SELECT t FROM Ticket t WHERE t.utente = :utente")
+})
 public class Ticket implements Serializable {
     private static final long serialVersionUID = 1L;
 

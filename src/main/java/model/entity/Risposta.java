@@ -12,6 +12,10 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "risposta")
+@NamedQueries({
+        @NamedQuery(name = "Risposta.faindAll", query = "SELECT r FROM Risposta r"),
+        @NamedQuery(name = "Risposta.faindAllByDomanda", query = "SELECT r FROM Risposta r WHERE r.domanda = :domanda")
+})
 public class Risposta implements Serializable {
     private static final long serialVersionUID = 1L;
 

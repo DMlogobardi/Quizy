@@ -13,6 +13,10 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "risponde")
+@NamedQueries({
+        @NamedQuery(name = "Risponde.faindAll", query = "SELECT ris FROM Risponde ris"),
+        @NamedQuery(name = "Risponde.faindAllByUtente", query = "SELECT ris FROM Risponde ris WHERE ris.utente = :utente")
+})
 public class Risponde implements Serializable {
     private static final long serialVersionUID = 1L;
 

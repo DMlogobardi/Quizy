@@ -15,6 +15,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "quiz")
+@NamedQueries({
+        @NamedQuery(name = "Quiz.findAll", query = "SELECT q FROM Quiz q"),
+        @NamedQuery(name = "Quiz.findAllByUtente", query = "SELECT q FROM Quiz q WHERE q.utente = :utente")
+})
 public class Quiz implements Serializable {
     private static final long serialVersionUID = 1L;
 
