@@ -1,20 +1,28 @@
 package model.dao;
 
+import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 import model.entity.Domanda;
 import model.entity.Risposta;
 import model.exception.AppException;
 import model.exception.EmptyFild;
+import model.exception.RegisterFailed;
+import model.exception.UserNotFoundException;
 
 import java.util.List;
 
+@Dependent
 public class RispostaDAO {
 
     @Inject
     private EntityManager em;
+
+    public RispostaDAO() {
+    }
 
     public List<Risposta> findAll(int pageNumber, int pageSize) throws EntityNotFoundException, AppException {
         if (pageNumber <= 0 || pageSize <= 0) {
@@ -53,14 +61,32 @@ public class RispostaDAO {
             throw new EmptyFild("Risposta is empty");
         }
 
-        em.persist(r);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.persist(r);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new RegisterFailed("Errore durante la registrazione");
+        }
     }
 
     public void update(Risposta r) throws EntityNotFoundException, EmptyFild {
         if(r == null) {
             throw new EmptyFild("Risposta is empty");
         }
-        em.merge(r);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.merge(r);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new AppException("Errore durante l'update");
+        }
     }
 
     public void delete(Risposta r) throws EntityNotFoundException, EmptyFild {
@@ -68,6 +94,15 @@ public class RispostaDAO {
             throw new EmptyFild("Risposta is empty");
         }
 
-        em.remove(em.merge(r));
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.remove(em.merge(r));
+            tx.commit();
+        } catch (EntityNotFoundException e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new UserNotFoundException("utente non trovato");
+        }
     }
 }

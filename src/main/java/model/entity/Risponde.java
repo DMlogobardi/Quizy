@@ -4,12 +4,15 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "risponde")
@@ -17,6 +20,7 @@ import java.time.Instant;
         @NamedQuery(name = "Risponde.faindAll", query = "SELECT ris FROM Risponde ris"),
         @NamedQuery(name = "Risponde.faindAllByUtente", query = "SELECT ris FROM Risponde ris WHERE ris.utente = :utente")
 })
+@XmlRootElement
 public class Risponde implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -29,14 +33,14 @@ public class Risponde implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_utente", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("utente-risponde")
     private Utente utente;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_risposta", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("risponde-risposta")
     private Risposta risposta;
 
     @Size(max = 200)
@@ -44,9 +48,8 @@ public class Risponde implements Serializable {
     @Column(name = "quiz", nullable = false, length = 200)
     private String quiz;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "scelto_il")
-    private Instant sceltoIl;
+    @Column(name = "scelto_il", insertable = false, updatable = false)
+    private LocalDateTime sceltoIl;
 
     @ManyToOne
     @JoinColumn(name = "id_fa") // Colleghiamo la risposta allo specifico tentativo
@@ -55,7 +58,7 @@ public class Risponde implements Serializable {
 
     public Risponde() {}
 
-    public Risponde(Risposta risposta, Utente utente, String quiz, Instant sceltoIl) {
+    public Risponde(Risposta risposta, Utente utente, String quiz, LocalDateTime sceltoIl) {
         this.risposta = risposta;
         this.utente = utente;
         this.quiz = quiz;
@@ -94,11 +97,11 @@ public class Risponde implements Serializable {
         this.quiz = quiz;
     }
 
-    public Instant getSceltoIl() {
+    public LocalDateTime getSceltoIl() {
         return sceltoIl;
     }
 
-    public void setSceltoIl(Instant sceltoIl) {
+    public void setSceltoIl(LocalDateTime sceltoIl) {
         this.sceltoIl = sceltoIl;
     }
 

@@ -1,19 +1,27 @@
 package model.dao;
 
+import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityTransaction;
 import model.entity.Domanda;
 import model.entity.Quiz;
 import model.exception.AppException;
 import model.exception.EmptyFild;
+import model.exception.RegisterFailed;
+import model.exception.UserNotFoundException;
 
 import java.util.List;
 
+@Dependent
 public class DomandaDAO {
 
     @Inject
     private EntityManager em;
+
+    public DomandaDAO() {
+    }
 
     public Domanda findById(int id) throws AppException {
         if (id <= 0) {
@@ -52,14 +60,32 @@ public class DomandaDAO {
         if (d == null) {
             throw new EmptyFild("Domanda invalido");
         }
-        em.remove(em.merge(d));
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.remove(em.merge(d));
+            tx.commit();
+        } catch (EntityNotFoundException e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new UserNotFoundException("utente non trovato");
+        }
     }
 
     public void insert(Domanda d) throws EmptyFild, EntityNotFoundException {
         if (d == null) {
             throw new EmptyFild("Domanda invalido");
         }
-        em.persist(d);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.persist(d);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new RegisterFailed("Errore durante la registrazione");
+        }
     }
 
     public void update(Domanda d) throws EmptyFild, EntityNotFoundException {
@@ -67,6 +93,15 @@ public class DomandaDAO {
             throw new EmptyFild("Domanda invalido");
         }
 
-        em.merge(d);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.merge(d);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new AppException("Errore durante l'update");
+        }
     }
 }

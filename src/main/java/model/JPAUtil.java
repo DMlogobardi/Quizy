@@ -1,5 +1,8 @@
 package model;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.Disposes;
 import jakarta.enterprise.inject.Produces;
@@ -7,23 +10,21 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+@ApplicationScoped
 public class JPAUtil {
 
-    private static final String PERSISTENCE_UNIT_NAME = "QuizyPU";
-    private static EntityManagerFactory emf;
+    private static final String PERSISTENCE_UNIT_NAME = "quiz-app";
 
-    static {
-        try {
-            emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-        } catch (Throwable ex) {
-            System.err.println("Inizializzazione EntityManagerFactory fallita: " + ex);
-            throw new ExceptionInInitializerError(ex);
-        }
+    private EntityManagerFactory emf;
+
+    @PostConstruct
+    void init() {
+        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
     }
 
     @Produces
     @RequestScoped
-    public static EntityManager getEntityManagerFactory() {
+    public EntityManager produceEntityManager() {
         return emf.createEntityManager();
     }
 
@@ -33,7 +34,8 @@ public class JPAUtil {
         }
     }
 
-    public static void shutdown() {
+    @PreDestroy
+    void shutdown() {
         if (emf != null && emf.isOpen()) {
             emf.close();
         }

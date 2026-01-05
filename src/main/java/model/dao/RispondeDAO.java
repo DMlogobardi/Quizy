@@ -1,19 +1,27 @@
 package model.dao;
 
+import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityTransaction;
 import model.entity.Risponde;
 import model.entity.Utente;
 import model.exception.AppException;
 import model.exception.EmptyFild;
+import model.exception.RegisterFailed;
+import model.exception.UserNotFoundException;
 
 import java.util.List;
 
+@Dependent
 public class RispondeDAO {
 
     @Inject
     private EntityManager em;
+
+    public RispondeDAO() {
+    }
 
     public Risponde findById(int id) throws AppException, EntityNotFoundException {
         if (id <= 0) {
@@ -54,7 +62,16 @@ public class RispondeDAO {
             throw new EmptyFild("Risponde invalido");
         }
 
-        em.persist(ris);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.persist(ris);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new RegisterFailed("Errore durante la registrazione");
+        }
     }
 
     public void update(Risponde ris) throws AppException, EmptyFild {
@@ -62,7 +79,16 @@ public class RispondeDAO {
             throw new EmptyFild("Risponde invalido");
         }
 
-        em.merge(ris);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.merge(ris);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new AppException("Errore durante l'update");
+        }
     }
 
     public void delete(Risponde ris) throws AppException, EmptyFild {
@@ -70,6 +96,15 @@ public class RispondeDAO {
             throw new EmptyFild("Risponde invalido");
         }
 
-        em.remove(em.merge(ris));
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.remove(em.merge(ris));
+            tx.commit();
+        } catch (EntityNotFoundException e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new UserNotFoundException("utente non trovato");
+        }
     }
 }

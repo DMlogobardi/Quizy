@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 import java.util.List;
+
 
 @Entity
 @Table(name = "domanda")
@@ -16,6 +18,7 @@ import java.util.List;
         @NamedQuery(name = "Domanda.findAll", query = "SELECT d FROM Domanda d"),
         @NamedQuery(name = "Domanda.findAllByQuiz", query = "SELECT d FROM Domanda d WHERE d.quiz = :quiz")
 })
+@XmlRootElement
 public class Domanda implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -28,7 +31,7 @@ public class Domanda implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_quiz", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("quiz-domande")
     private Quiz quiz;
 
     @NotNull
@@ -45,7 +48,7 @@ public class Domanda implements Serializable {
     private Integer puntiRispostaSbagliata;
 
     @OneToMany(mappedBy = "domanda", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference("domanda-risposte")
     private List<Risposta> risposte;
 
     public Domanda() {

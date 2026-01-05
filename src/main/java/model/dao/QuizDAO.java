@@ -1,19 +1,27 @@
 package model.dao;
 
+import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityTransaction;
 import model.entity.Quiz;
 import model.entity.Utente;
 import model.exception.AppException;
 import model.exception.EmptyFild;
+import model.exception.RegisterFailed;
+import model.exception.UserNotFoundException;
 
 import java.util.List;
 
+@Dependent
 public class QuizDAO {
 
     @Inject
     private EntityManager em;
+
+    public QuizDAO() {
+    }
 
     public Quiz findById(int id) throws EntityNotFoundException, AppException {
         if (id <= 0) {
@@ -53,7 +61,16 @@ public class QuizDAO {
             throw new EmptyFild("Quiz invalido");
         }
 
-        em.persist(quiz);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.persist(quiz);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new RegisterFailed("Errore durante la registrazione");
+        }
     }
 
     public void update(Quiz quiz) throws EntityNotFoundException, EmptyFild {
@@ -61,7 +78,16 @@ public class QuizDAO {
             throw new EmptyFild("Quiz invalido");
         }
 
-        em.merge(quiz);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.merge(quiz);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new AppException("Errore durante l'update");
+        }
     }
 
     public void delete(Quiz quiz) throws EntityNotFoundException, EmptyFild {
@@ -69,6 +95,15 @@ public class QuizDAO {
             throw new EmptyFild("Quiz invalido");
         }
 
-        em.remove(em.merge(quiz));
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.remove(em.merge(quiz));
+            tx.commit();
+        } catch (EntityNotFoundException e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new UserNotFoundException("utente non trovato");
+        }
     }
 }

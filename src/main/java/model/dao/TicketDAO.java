@@ -1,20 +1,28 @@
 package model.dao;
 
+import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 import model.entity.Ticket;
 import model.entity.Utente;
 import model.exception.AppException;
 import model.exception.EmptyFild;
+import model.exception.RegisterFailed;
+import model.exception.UserNotFoundException;
 
 import java.util.List;
 
+@Dependent
 public class TicketDAO {
 
     @Inject
     private EntityManager em;
+
+    public TicketDAO() {
+    }
 
     public List<Ticket> findAll(int pageNumber, int pageSize) throws EntityNotFoundException, AppException {
         if (pageNumber <= 0 || pageSize <= 0) {
@@ -55,7 +63,16 @@ public class TicketDAO {
             throw new EmptyFild("dati ticket vuoto");
         }
 
-        em.remove(em.merge(ticket));
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.remove(em.merge(ticket));
+            tx.commit();
+        } catch (EntityNotFoundException e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new UserNotFoundException("utente non trovato");
+        }
     }
 
     public void update(Ticket ticket) throws EmptyFild, EntityNotFoundException {
@@ -63,7 +80,16 @@ public class TicketDAO {
             throw new EmptyFild("dati ticket vuoto");
         }
 
-        em.merge(ticket);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.merge(ticket);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new AppException("Errore durante l'update");
+        }
     }
 
     public void insert(Ticket ticket) throws EmptyFild, EntityNotFoundException {
@@ -71,6 +97,15 @@ public class TicketDAO {
             throw new EmptyFild("dati ticket vuoto");
         }
 
-        em.persist(ticket);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.persist(ticket);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new RegisterFailed("Errore durante la registrazione");
+        }
     }
 }

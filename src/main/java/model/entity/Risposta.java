@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
+
 
 @Entity
 @Table(name = "risposta")
@@ -16,6 +18,7 @@ import java.io.Serializable;
         @NamedQuery(name = "Risposta.faindAll", query = "SELECT r FROM Risposta r"),
         @NamedQuery(name = "Risposta.faindAllByDomanda", query = "SELECT r FROM Risposta r WHERE r.domanda = :domanda")
 })
+@XmlRootElement
 public class Risposta implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -28,7 +31,7 @@ public class Risposta implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_domanda", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("domanda-risposte")
     private Domanda domanda;
 
     @Size(max = 150)

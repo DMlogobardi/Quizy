@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serializable;
 import java.util.List;
+
 
 @Entity
 @Table(name = "utente")
@@ -16,6 +18,7 @@ import java.util.List;
         @NamedQuery(name = "Utente.login", query = "SELECT u FROM Utente u WHERE u.username = :username"),
         @NamedQuery(name = "Utente.findById", query = "SELECT u FROM Utente u WHERE u.id = :id")
 })
+@XmlRootElement
 public class Utente implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -57,15 +60,15 @@ public class Utente implements Serializable {
     private Boolean isManager;
 
     @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference("utente-quiz")
     private List<Quiz> quizCreati;
 
     @OneToMany(mappedBy = "utente")
-    @JsonManagedReference
+    @JsonManagedReference("utente-fa")
     private List<Fa> partecipazioni;
 
     @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference("utente-ticket")
     private List<Ticket> ticketCreati;
 
     public Utente() {}

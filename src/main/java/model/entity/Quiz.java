@@ -5,13 +5,16 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Entity
 @Table(name = "quiz")
@@ -19,6 +22,7 @@ import java.util.List;
         @NamedQuery(name = "Quiz.findAll", query = "SELECT q FROM Quiz q"),
         @NamedQuery(name = "Quiz.findAllByUtente", query = "SELECT q FROM Quiz q WHERE q.utente = :utente")
 })
+@XmlRootElement
 public class Quiz implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -30,7 +34,7 @@ public class Quiz implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "id_utente")
-    @JsonBackReference
+    @JsonBackReference("utente-quiz")
     private Utente utente;
 
     @Size(max = 50)
@@ -56,18 +60,17 @@ public class Quiz implements Serializable {
     @Column(name = "numero_domande")
     private Integer numeroDomande;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "creato_il")
-    private Instant creatoIl;
+    @Column(name = "creato_il", insertable = false, updatable = false)
+    private LocalDateTime creatoIl;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference("quiz-domande")
     private List<Domanda> domande;
 
     public Quiz() {
     }
 
-    public Quiz(Utente utente, String tempo, String difficolta, String titolo, String descrizione, Integer numeroDomande, Instant creatoIl) {
+    public Quiz(Utente utente, String tempo, String difficolta, String titolo, String descrizione, Integer numeroDomande, LocalDateTime creatoIl) {
         this.utente = utente;
         this.tempo = tempo;
         this.difficolta = difficolta;
@@ -133,11 +136,11 @@ public class Quiz implements Serializable {
         this.numeroDomande = numeroDomande;
     }
 
-    public Instant getCreatoIl() {
+    public LocalDateTime getCreatoIl() {
         return creatoIl;
     }
 
-    public void setCreatoIl(Instant creatoIl) {
+    public void setCreatoIl(LocalDateTime creatoIl) {
         this.creatoIl = creatoIl;
     }
 

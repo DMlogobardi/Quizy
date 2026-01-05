@@ -1,9 +1,8 @@
 package model.dao;
 
+import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.Query;
+import jakarta.persistence.*;
 import model.entity.Utente;
 import model.exception.AppException;
 import model.exception.EmptyFild;
@@ -11,13 +10,15 @@ import model.exception.RegisterFailed;
 import model.exception.UserNotFoundException;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+@Dependent
 public class UtenteDAO {
 
     @Inject
     private EntityManager em;
+
+    public UtenteDAO() {
+    }
 
     public List<Utente> findAllPaginated(int pageNumber, int pageSize) throws UserNotFoundException, AppException {
         if (pageNumber <= 0 || pageSize <= 0) {
@@ -30,11 +31,23 @@ public class UtenteDAO {
                 .getResultList();
     }
 
-    public Utente findForLogin(String username) throws UserNotFoundException {
-        Query q = em.createNamedQuery("Utente.login", Utente.class);
-        q.setParameter("username", username);
+    public Utente findForLogin(String username) throws UserNotFoundException, EmptyFild {
+        if(username == null || username.isEmpty()) {
+            throw new EmptyFild("Username non trovato");
+        }
 
-        return (Utente) q.getSingleResult();
+        try {
+            Query q = em.createNamedQuery("Utente.login", Utente.class);
+            q.setParameter("username", username);
+            return (Utente) q.getSingleResult();
+        } catch (NoResultException e) {
+            // Se non c'è risultato, rilancio solo la mia eccezione
+            throw new UserNotFoundException("Username non trovato");
+        } catch (Exception e) {
+            // Se vuoi loggare, fallo ma rilancia solo la tua eccezione
+            System.err.println("Errore generico durante login: " + e.getMessage());
+            throw new UserNotFoundException("Username non trovato");
+        }
     }
 
     public Utente findById(Integer id) throws UserNotFoundException, AppException {
@@ -45,23 +58,46 @@ public class UtenteDAO {
         Query q = em.createNamedQuery("Utente.findById", Utente.class);
         q.setParameter("id", id);
 
-        return (Utente) q.getSingleResult();
+        try {
+            return (Utente) q.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new UserNotFoundException("id non trovato");
+        }
     }
+
 
     public void register(Utente u) throws RegisterFailed {
         if(u == null) {
             throw new RegisterFailed("dati utente vuoti");
         }
 
-        em.persist(u);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.persist(u);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new RegisterFailed("Errore durante la registrazione");
+        }
     }
 
-    public void update(Utente u) throws EmptyFild {
+    public void update(Utente u) throws EmptyFild, AppException {
         if(u == null) {
             throw new EmptyFild("dati utente vuoti");
         }
-
-        em.merge(u);
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.merge(u);
+            tx.commit();
+        }catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            throw new AppException("Errore durante l'update");
+        }
     }
 
     public void delete(Utente u) throws EmptyFild, UserNotFoundException {
@@ -69,10 +105,14 @@ public class UtenteDAO {
             throw new EmptyFild("utente e null");
         }
 
+        EntityTransaction tx = em.getTransaction();
         try {
+            tx.begin();
             em.remove(em.merge(u));
+            tx.commit();
         } catch (EntityNotFoundException e) {
-            Logger.getLogger(UtenteDAO.class.getName()).log(Level.SEVERE, null, e);
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
             throw new UserNotFoundException("utente non trovato");
         }
     }
