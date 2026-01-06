@@ -70,4 +70,23 @@ public class AutanticateAPI {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
+
+    @POST
+    @Path("/newPassword")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response cambiapassword (Map<String,String> body){
+        try {
+            String token = body.get("token");
+            String password = body.get("password");
+            String oldPassword = body.get("oldPassword");
+
+            auth.newPassword(password, oldPassword, token);
+
+            return Response.ok().build();
+        } catch (AppException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+    }
 }

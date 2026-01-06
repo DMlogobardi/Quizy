@@ -57,11 +57,31 @@ public class AutanticateMenager {
         try{
             String hash = crypt.hashPassword(u.getPasswordHash());
             u.setPasswordHash(hash);
+            u.setIsCompilatore(true);
+            u.setIsCreatore(false);
+            u.setIsManager(false);
             dao.register(u);
 
         } catch (AppException e) {
             System.out.println(e.getMessage());
             throw new RegisterFailed("Errore durante la registrazione");
+        }
+    }
+
+    public void newPassword(String password, String oldPassword, String token) throws AppException {
+        try {
+            jwtProvider.validateToken(token);
+
+            Utente u = logBeble.getUtente(token);
+            if(!crypt.verificaPassword(oldPassword, u.getPasswordHash())){
+                throw new AppException("password non cambiata");
+            }
+
+            u.setPasswordHash(crypt.hashPassword(password));
+            dao.update(u);
+        } catch (AppException e) {
+            e.printStackTrace();
+            throw new AppException("password non cambiata");
         }
     }
 
