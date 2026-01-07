@@ -5,6 +5,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.enterprise.context.ApplicationScoped;
 import model.entity.Utente;
 import model.exception.AppException;
+import model.exception.InvalidToken;
 import model.exception.TokenExpiredException;
 
 import javax.crypto.SecretKey;
@@ -34,17 +35,16 @@ public class JWT_Provider {
                 .compact();
     }
 
-    public boolean validateToken(String token) throws TokenExpiredException {
+    public void validateToken(String token) throws TokenExpiredException, InvalidToken {
         try {
             Jwts.parser()
                     .verifyWith(SECRET_KEY)
                     .build()
                     .parseSignedClaims(token);
-            return true;
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             throw new TokenExpiredException("Il token è scaduto. Effettua di nuovo il login.");
         } catch (Exception e) {
-            return false;
+            throw new InvalidToken("token invalido");
         }
     }
 

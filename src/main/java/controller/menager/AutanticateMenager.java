@@ -10,6 +10,7 @@ import model.entity.Utente;
 import model.exception.AppException;
 import model.exception.LoginFailed;
 import model.exception.RegisterFailed;
+import model.exception.TokenExpiredException;
 
 @ApplicationScoped
 public class AutanticateMenager {
@@ -70,7 +71,9 @@ public class AutanticateMenager {
 
     public void newPassword(String password, String oldPassword, String token) throws AppException {
         try {
-            jwtProvider.validateToken(token);
+            if (!logBeble.isAlive(token)) {
+                throw new AppException("Sessione non attiva o token non valido");
+            }
 
             Utente u = logBeble.getUtente(token);
             if(!crypt.verificaPassword(oldPassword, u.getPasswordHash())){
@@ -79,8 +82,10 @@ public class AutanticateMenager {
 
             u.setPasswordHash(crypt.hashPassword(password));
             dao.update(u);
+            logBeble.update(token, u);
+        } catch (TokenExpiredException e) {
+            throw e;
         } catch (AppException e) {
-            e.printStackTrace();
             throw new AppException("password non cambiata");
         }
     }

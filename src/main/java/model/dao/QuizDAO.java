@@ -73,37 +73,35 @@ public class QuizDAO {
         }
     }
 
-    public void update(Quiz quiz) throws EntityNotFoundException, EmptyFild {
-        if (quiz == null) {
-            throw new EmptyFild("Quiz invalido");
-        }
+    public void update(int quizId, Utente u) throws EntityNotFoundException, EmptyFild {
+        if (u == null || u.getId() == null) throw new EmptyFild("utente non valido");
 
-        EntityTransaction tx = em.getTransaction();
-        try {
-            tx.begin();
-            em.merge(quiz);
-            tx.commit();
-        }catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            e.printStackTrace();
-            throw new AppException("Errore durante l'update");
-        }
+        Quiz q = (Quiz) em.createQuery(
+                        "SELECT q FROM Quiz q WHERE q.id = :id AND q.utente.id = :userId", Quiz.class)
+                .setParameter("id", quizId)
+                .setParameter("userId", u.getId())
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("quiz non trovato o non appartiene all'utente"));
+
+        em.getTransaction().begin();
+        em.merge(q);
+        em.getTransaction().commit();
     }
 
-    public void delete(Quiz quiz) throws EntityNotFoundException, EmptyFild {
-        if (quiz == null) {
-            throw new EmptyFild("Quiz invalido");
-        }
+    public void delete(int quizId, Utente u) throws EntityNotFoundException, EmptyFild {
+        if (u == null || u.getId() == null) throw new EmptyFild("utente non valido");
 
-        EntityTransaction tx = em.getTransaction();
-        try {
-            tx.begin();
-            em.remove(em.merge(quiz));
-            tx.commit();
-        } catch (EntityNotFoundException e) {
-            if (tx.isActive()) tx.rollback();
-            e.printStackTrace();
-            throw new UserNotFoundException("utente non trovato");
-        }
+        Quiz q = (Quiz) em.createQuery(
+                        "SELECT q FROM Quiz q WHERE q.id = :id AND q.utente.id = :userId", Quiz.class)
+                .setParameter("id", quizId)
+                .setParameter("userId", u.getId())
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("quiz non trovato o non appartiene all'utente"));
+
+        em.getTransaction().begin();
+        em.remove(q);
+        em.getTransaction().commit();
     }
 }

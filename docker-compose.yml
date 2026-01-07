@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: quizy
+      MYSQL_USER: quizy
+      MYSQL_PASSWORD: quizy
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://db:3306/quizy
+      DB_USER: quizy
+      DB_PASSWORD: quizy123
+    depends_on:
+      - db
+
+volumes:
+  db_data:

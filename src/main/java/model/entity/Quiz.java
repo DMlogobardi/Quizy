@@ -63,6 +63,10 @@ public class Quiz implements Serializable {
     @Column(name = "creato_il", insertable = false, updatable = false)
     private LocalDateTime creatoIl;
 
+    @Size(max = 100)
+    @Column(name = "password", length = 100)
+    private String passwordQuiz;
+
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference("quiz-domande")
     private List<Domanda> domande;
@@ -70,7 +74,7 @@ public class Quiz implements Serializable {
     public Quiz() {
     }
 
-    public Quiz(Utente utente, String tempo, String difficolta, String titolo, String descrizione, Integer numeroDomande, LocalDateTime creatoIl) {
+    public Quiz(Utente utente, String tempo, String difficolta, String titolo, String descrizione, Integer numeroDomande, LocalDateTime creatoIl, String passwordQuiz) {
         this.utente = utente;
         this.tempo = tempo;
         this.difficolta = difficolta;
@@ -150,5 +154,13 @@ public class Quiz implements Serializable {
 
     public void setDomande(List<Domanda> domande) {
         this.domande = domande;
+    }
+
+    public @Size(max = 100) String getPasswordQuiz() {
+        return passwordQuiz;
+    }
+
+    public void setPasswordQuiz(@Size(max = 100) String passwordQuiz) {
+        this.passwordQuiz = passwordQuiz;
     }
 }

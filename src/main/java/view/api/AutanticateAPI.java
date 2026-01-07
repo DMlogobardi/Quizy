@@ -28,6 +28,9 @@ public class AutanticateAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response login (Utente loginData){
         try{
+            if(loginData == null){
+                return Response.status(Response.Status.NO_CONTENT).build();
+            }
             String token = auth.autenticate(loginData.getPasswordHash(), loginData.getUsername());
 
             Map<String, String> response = new HashMap<>();
@@ -46,6 +49,9 @@ public class AutanticateAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response register (Utente registerData){
         try{
+            if(registerData == null){
+                return Response.status(Response.Status.NO_CONTENT).build();
+            }
             auth.registra(registerData);
 
             return Response.ok().build();
@@ -61,6 +67,9 @@ public class AutanticateAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response logout (Map<String,String> body){
         try {
+            if(body == null){
+                return Response.status(Response.Status.NO_CONTENT).build();
+            }
             String token = body.get("token");
             auth.logout(token);
 
@@ -77,6 +86,9 @@ public class AutanticateAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response cambiapassword (Map<String,String> body){
         try {
+            if(body == null){
+                return Response.status(Response.Status.NO_CONTENT).build();
+            }
             String token = body.get("token");
             String password = body.get("password");
             String oldPassword = body.get("oldPassword");

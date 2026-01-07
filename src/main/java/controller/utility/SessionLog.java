@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import model.entity.Utente;
 import model.exception.AppException;
+import model.exception.InvalidToken;
 import model.exception.TokenExpiredException;
 
 import java.util.Map;
@@ -22,16 +23,24 @@ public class SessionLog {
     public void aggiungi(String token, Utente utente) throws TokenExpiredException, AppException {
         jwtProvider.validateToken(token);
 
-        // Controlla se l'utente è già presente nella mappa (sessione esistente)
-        boolean utenteGiaLoggato = logBible.values().stream()
-                .anyMatch(u -> u.getId().equals(utente.getId()));
+        String tokenEsistente = null;
 
-        if (utenteGiaLoggato) {
-            throw new AppException("Sessione già esistente per questo utente.");
+        for (Map.Entry<String, Utente> entry : logBible.entrySet()) {
+            if (entry.getValue().getId().equals(utente.getId())) {
+                tokenEsistente = entry.getKey();
+                break;
+            }
         }
 
-        // Aggiungi il token solo se l'utente non ha già una sessione
-        logBible.put(token, utente);
+        if (tokenEsistente != null) {
+            try {
+                jwtProvider.validateToken(tokenEsistente);
+                throw new AppException("Sessione già esistente per questo utente.");
+
+            } catch (TokenExpiredException e) {
+                logBible.remove(tokenEsistente);
+            }
+        }
     }
 
     public Utente getUtente(String token) throws TokenExpiredException {
@@ -47,14 +56,27 @@ public class SessionLog {
 
     public boolean isAlive(String token) throws TokenExpiredException, AppException {
         try {
-            if(!jwtProvider.validateToken(token)){
-                logBible.remove(token);
-                throw new AppException("Token non valido");
-            }
+            jwtProvider.validateToken(token); // lancia eccezione se scaduto o invalido
             return logBible.containsKey(token);
         } catch (TokenExpiredException e) {
-            logBible.remove(token);
+            logBible.remove(token); // rimuovi token scaduto
             throw e;
+        } catch (InvalidToken e) {
+            logBible.remove(token); // rimuovi token invalido
+            throw new AppException("Token non valido");
         }
+    }
+
+    public void update(String token, Utente updatedUtente) throws TokenExpiredException, AppException {
+        // Controlla che il token sia valido
+        jwtProvider.validateToken(token);
+
+        // Controlla che il token esista nella mappa
+        if (!logBible.containsKey(token)) {
+            throw new AppException("Sessione non trovata per questo token");
+        }
+
+        // Aggiorna l'utente associato al token
+        logBible.put(token, updatedUtente);
     }
 }
