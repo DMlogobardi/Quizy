@@ -1,0 +1,18 @@
+Questo pacchetto gestisce l'interfaccia utente (UI) e l'interazione diretta, corrispondendo alle
+schermate descritte nei mock-up.
+
+auth (Autenticazione):
+LoginActivity.java: Per lo scenario di login.
+RegisterActivity.java: Per lo scenario di registrazione.
+
+quiz (Gestione Quiz):
+QuizListActivity.java: Per visualizzare i quiz disponibili.
+QuizGameActivity.java: Per lo svolgimento del quiz (domanda per domanda).
+QuizResultActivity.java: Per mostrare il punteggio finale.
+
+creator (Lato Creatore):
+CreateQuizActivity.java: Per inserire titolo e impostazioni.
+AddQuestionsActivity.java: Per aggiungere domande e risposte.
+
+admin (Lato Gestore Account):
+AdminDashboardActivity.java: Per visualizzare le richieste di supporto o cambio ruolo.

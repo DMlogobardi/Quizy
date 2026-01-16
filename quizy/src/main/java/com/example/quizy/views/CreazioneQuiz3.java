@@ -43,5 +43,6 @@ public class CreazioneQuiz3 extends AppCompatActivity {
         i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         startActivity(i);
+        finish();
     }
 }

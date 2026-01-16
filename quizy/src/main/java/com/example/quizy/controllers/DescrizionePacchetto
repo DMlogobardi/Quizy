@@ -1,0 +1,7 @@
+Questo pacchetto fa da "ponte". In Android, i Controller contengono la
+logica che chiama il server e elabora i dati per la View.
+
+QuizManager.java: Contiene metodi come creaQuiz(), calcoloRisultato() e la logica per recuperare i quiz disponibili.
+UserManager.java: Gestisce il login (autenticazione), la registrazione e il cambio ruolo.
+SupportManager.java: Gestisce la creazione e risoluzione dei Ticket (segnalazioni).
+NetworkController.java (Opzionale ma consigliato): Una classe singola per gestire la connessione HTTP verso il server Tomcat (usando librerie come Retrofit o Volley), dato che il sistema comunica via HTTP/HTTPS.
