@@ -38,7 +38,7 @@ public class AutanticateMenager {
                 throw new LoginFailed("login fallito");
             }
 
-            token = jwtProvider.generateToken(u);
+            token = jwtProvider.generateToken(u, "compilatore");
             logBeble.aggiungi(token, u);
 
             return token;

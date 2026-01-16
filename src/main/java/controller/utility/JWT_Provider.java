@@ -22,12 +22,12 @@ public class JWT_Provider {
     public JWT_Provider() {
     }
 
-    public String generateToken(Utente utente) {
+    public String generateToken(Utente utente, String roole) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
 
         return Jwts.builder()
-                .subject(utente.getUsername())   // Username (Standard Claim)
+                .subject(roole)   // Username (Standard Claim)
                 .claim("id", utente.getId())     // ID Utente (Custom Claim)
                 .issuedAt(now)
                 .expiration(expiryDate)
@@ -64,7 +64,7 @@ public class JWT_Provider {
         }
     }
 
-    public String getUsernameFromToken(String token) throws TokenExpiredException, AppException {
+    public String getRoleFromToken(String token) throws TokenExpiredException, AppException {
         try {
             return Jwts.parser()
                     .verifyWith(SECRET_KEY)

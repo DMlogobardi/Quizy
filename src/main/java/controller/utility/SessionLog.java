@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionLog {
 
     private final Map<String, Utente> logBible = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, String> userIdToToken = new ConcurrentHashMap<>();
     @Inject
     private JWT_Provider jwtProvider;
 
@@ -23,24 +24,17 @@ public class SessionLog {
     public void aggiungi(String token, Utente utente) throws TokenExpiredException, AppException {
         jwtProvider.validateToken(token);
 
-        String tokenEsistente = null;
-
-        for (Map.Entry<String, Utente> entry : logBible.entrySet()) {
-            if (entry.getValue().getId().equals(utente.getId())) {
-                tokenEsistente = entry.getKey();
-                break;
-            }
-        }
-
-        if (tokenEsistente != null) {
+        String existing = userIdToToken.putIfAbsent(utente.getId(), token);
+        if (existing != null) {
             try {
-                jwtProvider.validateToken(tokenEsistente);
-                throw new AppException("Sessione già esistente per questo utente.");
-
+                jwtProvider.validateToken(existing);
+                throw new AppException("Sessione già esistente per questo utente");
             } catch (TokenExpiredException e) {
-                logBible.remove(tokenEsistente);
+                userIdToToken.remove(utente.getId(), existing);
             }
         }
+
+        logBible.put(token, utente);
     }
 
     public Utente getUtente(String token) throws TokenExpiredException {
@@ -59,6 +53,7 @@ public class SessionLog {
             jwtProvider.validateToken(token); // lancia eccezione se scaduto o invalido
             return logBible.containsKey(token);
         } catch (TokenExpiredException e) {
+            userIdToToken.remove(jwtProvider.getIdFromToken(token));
             logBible.remove(token); // rimuovi token scaduto
             throw e;
         } catch (InvalidToken e) {
@@ -71,12 +66,9 @@ public class SessionLog {
         // Controlla che il token sia valido
         jwtProvider.validateToken(token);
 
-        // Controlla che il token esista nella mappa
-        if (!logBible.containsKey(token)) {
+        Utente precedente = logBible.replace(token, updatedUtente);
+        if (precedente == null) {
             throw new AppException("Sessione non trovata per questo token");
         }
-
-        // Aggiorna l'utente associato al token
-        logBible.put(token, updatedUtente);
     }
 }

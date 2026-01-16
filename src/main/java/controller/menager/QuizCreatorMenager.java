@@ -1,9 +1,6 @@
 package controller.menager;
 
-import controller.utility.AccessControlService;
-import controller.utility.JWT_Provider;
-import controller.utility.PassCrypt;
-import controller.utility.SessionLog;
+import controller.utility.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,15 +21,16 @@ public class QuizCreatorMenager {
     SessionLog logBeble;
 
     @Inject
-    JWT_Provider jwtProvider;
-
-    @Inject
     AccessControlService accessControl;
 
     @Inject
     QuizDAO dao;
+
     @Inject
     private SessionLog sessionLog;
+
+    @Inject
+    private QuizLog quizLog;
 
     public QuizCreatorMenager() {
     }
@@ -41,13 +39,7 @@ public class QuizCreatorMenager {
         if (!logBeble.isAlive(token)) {
             throw new AppException("Sessione non attiva o token non valido");
         }
-
-        Utente u = logBeble.getUtente(token);
-        if(u == null){
-            throw new InvalidToken("token invalido");
-        }
-
-        accessControl.checkCompilatore(u);
+        accessControl.checkCompilatore(token);
     }
 
     public void createQuiz(Quiz quiz, String token) throws QuizServiceException, InvalidRole {
@@ -109,10 +101,25 @@ public class QuizCreatorMenager {
     public List<Quiz> getQuizzes(int pageNumber, int pageSize, String token) throws QuizServiceException, InvalidRole {
         try {
             tokenCheck(token);
-
             Utente u = sessionLog.getUtente(token);
 
-            return dao.findAllByUtente(pageNumber, pageSize, u);
+            List<Quiz> pagedQuizzes = quizLog.getQuizPaginati(u, pageNumber, pageSize);
+
+            if (pagedQuizzes.isEmpty()) {
+                pagedQuizzes = dao.findAllByUtente(pageNumber, pageSize, u);
+
+                if(pagedQuizzes != null && !pagedQuizzes.isEmpty()) {
+                    for (Quiz quiz : pagedQuizzes) {
+                        try {
+                            quizLog.aggiungi(u, quiz);
+                        } catch (AppException e) {
+
+                        }
+                    }
+                }
+            }
+
+            return pagedQuizzes;
 
         } catch (TokenExpiredException e) {
             throw new QuizServiceException("token expired, logout forzato");

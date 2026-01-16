@@ -65,12 +65,12 @@ public class AutanticateAPI {
     @Path("/logout")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response logout (Map<String,String> body){
+    public Response logout (@HeaderParam("Authorization") String authHeader){
         try {
-            if(body == null){
-                return Response.status(Response.Status.NO_CONTENT).build();
+            if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             }
-            String token = body.get("token");
+            String token = authHeader.replace("Bearer ", "");
             auth.logout(token);
 
             return Response.ok().build();
@@ -84,12 +84,15 @@ public class AutanticateAPI {
     @Path("/newPassword")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response cambiapassword (Map<String,String> body){
+    public Response cambiapassword (Map<String,String> body, @HeaderParam("Authorization") String authHeader){
         try {
             if(body == null){
                 return Response.status(Response.Status.NO_CONTENT).build();
             }
-            String token = body.get("token");
+            if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+            String token = authHeader.replace("Bearer ", "");
             String password = body.get("password");
             String oldPassword = body.get("oldPassword");
 

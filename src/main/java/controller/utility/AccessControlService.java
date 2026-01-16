@@ -2,29 +2,39 @@ package controller.utility;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import model.entity.Utente;
 import model.exception.InvalidRole;
 
 @ApplicationScoped
 public class AccessControlService {
 
+    @Inject
+    JWT_Provider jwtProvider;
+
     public AccessControlService() {
     }
 
-    public void checkCreatore(Utente u)throws InvalidRole {
-        if(u == null || !u.getIsCreatore()){
+    public void checkCreatore(String token)throws InvalidRole {
+        String role = jwtProvider.getRoleFromToken(token);
+
+        if(!role.equals("creatore")) {
             throw new InvalidRole("Unauthorized");
         }
     }
 
-    public void checkCompilatore(Utente u)throws InvalidRole {
-        if(u == null || !u.getIsCompilatore()){
+    public void checkCompilatore(String token)throws InvalidRole {
+        String role = jwtProvider.getRoleFromToken(token);
+
+        if(!role.equals("compilatore")) {
             throw new InvalidRole("Unauthorized");
         }
     }
 
-    public void checkManager(Utente u)throws InvalidRole {
-        if(u == null || !u.getIsManager()){
+    public void checkManager(String token)throws InvalidRole {
+        String role = jwtProvider.getRoleFromToken(token);
+
+        if(!role.equals("menager")) {
             throw new InvalidRole("Unauthorized");
         }
     }
