@@ -15,19 +15,16 @@ import java.util.List;
 public class QuizCreatorMenager {
 
     @Inject
-    PassCrypt crypt;
+    private PassCrypt crypt;
 
     @Inject
-    SessionLog logBeble;
+    private SessionLog logBeble;
 
     @Inject
-    AccessControlService accessControl;
+    private AccessControlService accessControl;
 
     @Inject
-    QuizDAO dao;
-
-    @Inject
-    private SessionLog sessionLog;
+    private QuizDAO dao;
 
     @Inject
     private QuizLog quizLog;
@@ -42,6 +39,20 @@ public class QuizCreatorMenager {
         accessControl.checkCompilatore(token);
     }
 
+    public String upUserRole(String token) throws AppException {
+        tokenCheck(token);
+        String newToken = "";
+
+        Utente u = logBeble.getUtente(token);
+        if (u.getIsCreatore()) {
+            newToken = accessControl.newTokenByRole("creatore", u);
+            logBeble.rimuovi(token);
+            logBeble.aggiungi(newToken, u);
+            return newToken;
+        }
+        throw new AppException("Unauthorized");
+    }
+
     public void createQuiz(Quiz quiz, String token) throws QuizServiceException, InvalidRole {
         try {
             tokenCheck(token);
@@ -51,7 +62,7 @@ public class QuizCreatorMenager {
                 quiz.setPasswordQuiz(hashedPassword);
             }
 
-            Utente u = sessionLog.getUtente(token);
+            Utente u = logBeble.getUtente(token);
             quiz.setUtente(u);
 
             dao.insert(quiz);
@@ -69,7 +80,7 @@ public class QuizCreatorMenager {
         try {
             tokenCheck(token);
 
-            Utente u = sessionLog.getUtente(token);
+            Utente u = logBeble.getUtente(token);
 
             dao.delete(quiz.getId(), u);
 
@@ -86,7 +97,7 @@ public class QuizCreatorMenager {
         try {
             tokenCheck(token);
 
-            Utente u = sessionLog.getUtente(token);
+            Utente u = logBeble.getUtente(token);
 
             dao.update(quiz.getId(), u);
         } catch (TokenExpiredException e) {
@@ -101,7 +112,7 @@ public class QuizCreatorMenager {
     public List<Quiz> getQuizzes(int pageNumber, int pageSize, String token) throws QuizServiceException, InvalidRole {
         try {
             tokenCheck(token);
-            Utente u = sessionLog.getUtente(token);
+            Utente u = logBeble.getUtente(token);
 
             List<Quiz> pagedQuizzes = quizLog.getQuizPaginati(u, pageNumber, pageSize);
 

@@ -1,5 +1,6 @@
 package controller.menager;
 
+import controller.utility.AccessControlService;
 import controller.utility.JWT_Provider;
 import controller.utility.PassCrypt;
 import controller.utility.SessionLog;
@@ -21,10 +22,10 @@ public class AutanticateMenager {
     private PassCrypt crypt;
 
     @Inject
-    private JWT_Provider jwtProvider;
+    private UtenteDAO dao;
 
     @Inject
-    private UtenteDAO dao;
+    private AccessControlService accessControlService;
 
     public AutanticateMenager() {
     }
@@ -38,7 +39,7 @@ public class AutanticateMenager {
                 throw new LoginFailed("login fallito");
             }
 
-            token = jwtProvider.generateToken(u, "compilatore");
+            token = accessControlService.newTokenByRole("compilatore", u);
             logBeble.aggiungi(token, u);
 
             return token;

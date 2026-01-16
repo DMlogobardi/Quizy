@@ -38,4 +38,8 @@ public class AccessControlService {
             throw new InvalidRole("Unauthorized");
         }
     }
+
+    public String newTokenByRole(String role, Utente u) {
+        return jwtProvider.generateToken(u, role);
+    }
 }

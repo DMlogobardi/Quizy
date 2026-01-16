@@ -23,6 +23,24 @@ public class QuizCreatorAPI {
     }
 
     @POST
+    @Path("/upRole")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response upRole(@HeaderParam("Authorization") String authHeader){
+        try {
+            if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+            String token = authHeader.replace("Bearer ", "");
+            String newToken = menager.upUserRole(token);
+            return Response.ok(newToken).build();
+        } catch (AppException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+    }
+
+    @POST
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
