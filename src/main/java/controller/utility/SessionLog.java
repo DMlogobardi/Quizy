@@ -44,8 +44,10 @@ public class SessionLog {
     }
 
     public void rimuovi(String token)  {
-
+        Utente u = getUtente(token);
+        userIdToToken.remove(u.getId(), token);
         logBible.remove(token);
+
     }
 
     public boolean isAlive(String token) throws TokenExpiredException, AppException {
