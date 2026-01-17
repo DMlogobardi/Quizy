@@ -36,7 +36,7 @@ public class QuizCreatorAPI {
             String newToken = menager.upUserRole(token);
 
             Map<String, String> response = new HashMap<>();
-            response.put("token", token);
+            response.put("token", newToken);
 
             return Response.ok(response).build();
         } catch (AppException e) {

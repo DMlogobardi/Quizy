@@ -40,24 +40,13 @@ public class QuizLog {
     }
 
     public void clearQuiz(Utente utente) throws AppException {
-        Map<Integer, Quiz> removed = logQuizBible.remove(utente);
-
-        if (removed == null) {
-            throw new AppException("Impossibile cancellare: l'utente " + utente.getNome() + " non ha quiz registrati.");
-        }
+        logQuizBible.remove(utente);
     }
 
     public Quiz getQuiz(Utente utente, int id) throws AppException {
         Map<Integer, Quiz> userQuizzes = logQuizBible.get(utente);
 
-        if (userQuizzes == null) {
-            throw new AppException("Nessun quiz registrato per questo utente.");
-        }
-
-        Quiz quiz = userQuizzes.get(id);
-        if (quiz == null) {
-            throw new AppException("Quiz con ID " + id + " non trovato.");
-        }
+        Quiz quiz = userQuizzes != null ? userQuizzes.get(id) : null;
 
         return quiz;
     }
