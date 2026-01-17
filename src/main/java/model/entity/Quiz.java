@@ -67,7 +67,7 @@ public class Quiz implements Serializable {
     @Column(name = "password", length = 100)
     private String passwordQuiz;
 
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference("quiz-domande")
     private List<Domanda> domande;
 

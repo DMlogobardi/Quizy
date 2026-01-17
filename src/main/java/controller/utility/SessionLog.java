@@ -45,7 +45,7 @@ public class SessionLog {
 
     public void rimuovi(String token)  {
         Utente u = getUtente(token);
-        userIdToToken.remove(u.getId(), token);
+        if (u != null) {userIdToToken.remove(u.getId(), token);}
         logBible.remove(token);
 
     }

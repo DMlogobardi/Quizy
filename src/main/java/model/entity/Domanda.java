@@ -47,7 +47,7 @@ public class Domanda implements Serializable {
     @Column(name = "punti_risposta_sbagliata", nullable = false)
     private Integer puntiRispostaSbagliata;
 
-    @OneToMany(mappedBy = "domanda", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "domanda", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference("domanda-risposte")
     private List<Risposta> risposte;
 
