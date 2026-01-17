@@ -9,6 +9,7 @@ import jakarta.ws.rs.core.Response;
 import model.entity.Quiz;
 import model.exception.AppException;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,11 @@ public class QuizCreatorAPI {
             }
             String token = authHeader.replace("Bearer ", "");
             String newToken = menager.upUserRole(token);
-            return Response.ok(newToken).build();
+
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+
+            return Response.ok(response).build();
         } catch (AppException e) {
             e.printStackTrace();
             return Response.status(Response.Status.UNAUTHORIZED).build();
