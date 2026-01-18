@@ -44,6 +44,7 @@ public class JWT_Provider {
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             throw new TokenExpiredException("Il token è scaduto. Effettua di nuovo il login.");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new InvalidToken("token invalido");
         }
     }

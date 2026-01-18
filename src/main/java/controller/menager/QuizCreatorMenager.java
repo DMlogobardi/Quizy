@@ -53,6 +53,7 @@ public class QuizCreatorMenager {
             newToken = accessControl.newTokenByRole("creatore", u);
             logBeble.rimuovi(token);
             logBeble.aggiungi(newToken, u);
+            quizLog.clearQuiz(u);
             return newToken;
         }
         throw new AppException("Unauthorized");
@@ -98,8 +99,9 @@ public class QuizCreatorMenager {
             tokenCheck(token);
 
             Utente u = logBeble.getUtente(token);
+            Quiz deleteQuiz = quizLog.getQuiz(u, quiz.getId());
 
-            dao.delete(quiz.getId(), u);
+            dao.delete(quiz.getId(), deleteQuiz, u);
 
         } catch (TokenExpiredException e) {
             throw new QuizServiceException("token expired, logout forzato");
@@ -116,13 +118,16 @@ public class QuizCreatorMenager {
             tokenCheck(token);
 
             Utente u = logBeble.getUtente(token);
+            Quiz oldQuiz = quizLog.getQuiz(u, quiz.getId());
 
-            dao.update(quiz, u);
+            dao.update(quiz, oldQuiz, u);
+
         } catch (TokenExpiredException e) {
             throw new QuizServiceException("token expired, logout forzato");
         } catch (EntityNotFoundException e) {
             throw new QuizServiceException("Error creating quiz");
         } catch (AppException e) {
+            e.printStackTrace();
             throw new QuizServiceException("Error updating quiz");
         }
     }

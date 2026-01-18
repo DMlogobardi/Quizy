@@ -8,18 +8,21 @@ services:
       MYSQL_USER: quizy
       MYSQL_PASSWORD: quizy
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d 
 
   backend:
-    build: .
+    build:
+        context: .
+        dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
       DB_URL: jdbc:mysql://db:3306/quizy
       DB_USER: quizy
-      DB_PASSWORD: quizy123
+      DB_PASSWORD: quizy
     depends_on:
       - db
 

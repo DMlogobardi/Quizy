@@ -59,6 +59,7 @@ public class SessionLog {
             logBible.remove(token); // rimuovi token scaduto
             throw e;
         } catch (InvalidToken e) {
+            userIdToToken.remove(jwtProvider.getIdFromToken(token));
             logBible.remove(token); // rimuovi token invalido
             throw new AppException("Token non valido");
         }
