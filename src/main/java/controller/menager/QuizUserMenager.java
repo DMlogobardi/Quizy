@@ -10,7 +10,11 @@ import model.entity.Risposta;
 import model.entity.Utente;
 import model.exception.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class QuizUserMenager {
@@ -38,6 +42,39 @@ public class QuizUserMenager {
             throw new AppException("Sessione non attiva o token non valido");
         }
         accessControl.checkCompilatore(token);
+    }
+
+    private int punteggioRisposta(List<Domanda> domande, List<Risposta> risposte) throws AppException {
+        Map<Integer, Domanda> domandeById = domande.stream()
+                .collect(Collectors.toMap(
+                        Domanda::getId,
+                        d -> d
+                ));
+
+        int punteggio = 0;
+        Set<Integer> domandeRisposte = new HashSet<>();
+
+        for (Risposta risposta : risposte) {
+
+            if (risposta.getDomanda() == null || risposta.getDomanda().getId() == null)
+                throw new AppException("Risposta non valida");
+
+            Integer domandaId = risposta.getDomanda().getId();
+
+            Domanda d = domandeById.get(domandaId);
+            if(d == null)
+                throw new AppException("Domanda non valida");
+
+            if(!domandeRisposte.add(domandaId))
+                throw new AppException("Domanda risposta piu volte");
+
+            if(risposta.getFlagRispostaCorretta()) {
+                punteggio += d.getPuntiRispostaCorretta();
+            } else {
+                punteggio += d.getPuntiRispostaSbagliata();
+            }
+        }
+        return punteggio;
     }
 
     public String downUserRole (String token) throws AppException {
@@ -87,7 +124,7 @@ public class QuizUserMenager {
         }
     }
 
-    public int completaQuiz(Quiz quiz, String token) throws QuizUseException, InvalidRole {
+    public int completaQuiz(Quiz quiz, List<Risposta> risposteClient, String token) throws QuizUseException, InvalidRole {
         try {
             tokenCheck(token);
             Utente u = logBeble.getUtente(token);
@@ -101,12 +138,12 @@ public class QuizUserMenager {
                 }
             }
 
-            int punteggio = 0, corretto = 0, sbagliato = 0;
+            List<Domanda> domandeDb = quizCorretto.getDomande();
 
-            List<Domanda> domande = quizCorretto.getDomande();
-            for (Domanda domanda : domande) {
+            if (domandeDb == null || risposteClient == null)
+                throw new AppException("liste mancanti");
 
-            }
+            return punteggioRisposta(domandeDb, risposteClient);
 
         } catch (TokenExpiredException e) {
             throw new QuizServiceException("token expired, logout forzato");
