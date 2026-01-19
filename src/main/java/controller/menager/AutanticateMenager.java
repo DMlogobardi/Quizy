@@ -35,6 +35,10 @@ public class AutanticateMenager {
         try {
             Utente u = dao.findForLogin(username);
 
+            if (u == null) {
+                throw new LoginFailed("login fallito");
+            }
+
             if (!crypt.verificaPassword(password, u.getPasswordHash())) {
                 throw new LoginFailed("login fallito");
             }
