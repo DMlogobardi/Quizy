@@ -86,7 +86,7 @@ public class AutanticateAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response cambiapassword (Map<String,String> body, @HeaderParam("Authorization") String authHeader){
         try {
-            if(body == null){
+            if(body == null || body.isEmpty()){
                 return Response.status(Response.Status.NO_CONTENT).build();
             }
             if(authHeader == null || !authHeader.startsWith("Bearer ")) {

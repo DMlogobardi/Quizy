@@ -41,18 +41,13 @@ public class DomandaDAO {
                 .getResultList();
     }
 
-    public List<Domanda> findAllByQuiz(int pageNumber, int pageSize, Quiz quiz) throws AppException, EntityNotFoundException, Exception {
-        if (pageNumber <= 0 || pageSize <= 0) {
-            throw new AppException("Pagina invalida");
-        }
+    public List<Domanda> findAllByQuiz(Quiz quiz) throws AppException, EntityNotFoundException, Exception {
         if (quiz == null) {
             throw new EmptyFild("Quiz invalido");
         }
 
         return em.createNamedQuery("Domanda.findAllByQuiz", Domanda.class)
                 .setParameter("quiz", quiz)
-                .setFirstResult((pageNumber - 1) * pageSize)
-                .setMaxResults(pageSize)
                 .getResultList();
     }
 

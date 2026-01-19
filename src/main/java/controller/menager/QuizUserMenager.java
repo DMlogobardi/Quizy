@@ -124,6 +124,47 @@ public class QuizUserMenager {
         }
     }
 
+    public List<Domanda> startQuiz(Quiz quiz, String password, String token) throws QuizUseException, InvalidRole  {
+        try {
+            tokenCheck(token);
+            Utente u = logBeble.getUtente(token);
+            Quiz q = quizLog.getQuiz(u, quiz.getId());
+
+            if( q == null) {
+                q = dao.findById(quiz.getId());
+            }
+
+            if(!crypt.verificaPassword(password, q.getPasswordQuiz())) {
+                throw new QuizUseException("impossibile accedere al quiz");
+            }
+
+            return quiz.getDomande();
+        } catch (TokenExpiredException e) {
+            throw new QuizServiceException("token expired, logout forzato");
+        } catch (AppException e) {
+            throw new QuizServiceException("Error getting quizzes");
+        }
+    }
+
+    public List<Domanda> startQuiz(Quiz quiz, String token) throws QuizUseException, InvalidRole  {
+        try {
+            tokenCheck(token);
+            Utente u = logBeble.getUtente(token);
+            Quiz q = quizLog.getQuiz(u, quiz.getId());
+
+            if( q == null) {
+                q = dao.findById(quiz.getId());
+            }
+
+            return quiz.getDomande();
+
+        } catch (TokenExpiredException e) {
+            throw new QuizServiceException("token expired, logout forzato");
+        } catch (AppException e) {
+            throw new QuizServiceException("Error getting quizzes");
+        }
+    }
+
     public int completaQuiz(Quiz quiz, List<Risposta> risposteClient, String token) throws QuizUseException, InvalidRole {
         try {
             tokenCheck(token);

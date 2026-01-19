@@ -109,6 +109,11 @@ public class QuizCreatorAPI {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
             String token = authHeader.replace("Bearer ", "");
+
+            if (body == null || body.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+
             int page = Integer.parseInt(body.get("page"));
             int offset = Integer.parseInt(body.get("offset"));
             List<Quiz> quizList = menager.getQuizzes(page, offset, token);
