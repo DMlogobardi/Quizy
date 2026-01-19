@@ -22,7 +22,6 @@ public class SessionLog {
     }
 
     public void aggiungi(String token, Utente utente) throws TokenExpiredException, AppException {
-        jwtProvider.validateToken(token);
 
         String existing = userIdToToken.putIfAbsent(utente.getId(), token);
         if (existing != null) {
