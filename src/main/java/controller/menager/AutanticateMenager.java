@@ -45,7 +45,7 @@ public class AutanticateMenager {
             return token;
 
         } catch (AppException e) {
-            logBeble.rimuovi(token);
+            e.printStackTrace();
             System.out.println(e.getMessage());
             throw new LoginFailed("Errore durante l'autenticazione");
         }
