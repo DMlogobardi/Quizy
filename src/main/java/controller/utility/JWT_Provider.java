@@ -39,6 +39,7 @@ public class JWT_Provider {
         try {
             Jwts.parser()
                     .verifyWith(SECRET_KEY)
+                    .clockSkewSeconds(60)
                     .build()
                     .parseSignedClaims(token);
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
