@@ -4,6 +4,7 @@ import controller.utility.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.NoResultException;
 import model.dao.FaDAO;
 import model.dao.QuizDAO;
 import model.dao.RispondeDAO;
@@ -85,6 +86,8 @@ public class QuizUserMenager {
         try {
             daoFa.findByUtenteQuiz(Quiz, u);
             return true;
+        } catch (NoResultException e) {
+            return false;
         } catch (EntityNotFoundException e) {
             return false;
         }
@@ -172,6 +175,10 @@ public class QuizUserMenager {
                 q = dao.findById(quiz.getId());
             }
 
+            if( q.getPasswordQuiz() != null) {
+                throw new QuizUseException("password is allowed");
+            }
+
             if(!isComplete(u, q))
                 return q.getDomande();
             else
@@ -203,7 +210,7 @@ public class QuizUserMenager {
                 throw new AppException("liste mancanti");
 
             int punteggio = punteggioRisposta(domandeDb, risposteClient);
-            Fa fa = new Fa(u, quiz, punteggio);
+            Fa fa = new Fa(u, quizCorretto, punteggio);
             List<Risponde> risposte = new ArrayList<>();
             for (Risposta r : risposteClient) {
                 risposte.add(new Risponde(r, u, quizCorretto.getTitolo(), LocalDateTime.now()));
