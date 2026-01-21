@@ -110,12 +110,13 @@ public class QuizUserMenager {
         throw new AppException("Unauthorized");
     }
 
-    public List<Quiz> getQuizzes(int pageNumber, int pageSize, String token) throws QuizUseException, InvalidRole {
+    public List<Quiz> getQuizzes(int pageNumber, String token) throws QuizUseException, InvalidRole {
         try {
             tokenCheck(token);
             Utente u = logBeble.getUtente(token);
-
+            int pageSize = 10;
             List<Quiz> pagedQuizzes = quizLog.getQuizPaginati(u, pageNumber, pageSize);
+
 
             if(pagedQuizzes == null || pagedQuizzes.isEmpty()) {
                 pagedQuizzes = dao.findAll(pageNumber, pageSize);

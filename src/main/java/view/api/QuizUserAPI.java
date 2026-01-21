@@ -69,12 +69,10 @@ public class QuizUserAPI {
             }
 
             int page = Integer.parseInt(body.get("page"));
-            int offset = Integer.parseInt(body.get("offset"));
-            List<Quiz> quizList = useMenager.getQuizzes(page, offset, token);
+            List<Quiz> quizList = useMenager.getQuizzes(page, token);
             List<QuizDTO> quizSummaries = quizList.stream()
                     .map(QuizDTO::new)
                     .toList();
-
 
             return Response.ok(quizSummaries).build();
         } catch (MalformedJwtException e) {
