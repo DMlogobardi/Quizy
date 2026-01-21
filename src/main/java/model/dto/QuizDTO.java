@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 public class QuizDTO implements Serializable {
     private int id;
+    private String titolo;
     private String tempo;
     private String difficolta;
     private String descrizione;
@@ -17,6 +18,7 @@ public class QuizDTO implements Serializable {
 
     public QuizDTO(Quiz quiz) {
         this.id = quiz.getId();
+        this.titolo = quiz.getTitolo();
         this.numero_domande = quiz.getNumeroDomande();
         this.descrizione = quiz.getDescrizione();
         this.difficolta = quiz.getDifficolta();
@@ -72,5 +74,13 @@ public class QuizDTO implements Serializable {
 
     public void setPasswordRichiesta(Boolean passwordRichiesta) {
         this.passwordRichiesta = passwordRichiesta;
+    }
+
+    public String getTitolo() {
+        return titolo;
+    }
+
+    public void setTitolo(String titolo) {
+        this.titolo = titolo;
     }
 }
