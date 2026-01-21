@@ -64,8 +64,10 @@ public class QuizCreatorMenager {
             tokenCheck(token);
 
             if (quiz.getPasswordQuiz() != null) {
-                String hashedPassword = crypt.hashPassword(quiz.getPasswordQuiz());
-                quiz.setPasswordQuiz(hashedPassword);
+                if(!quiz.getPasswordQuiz().isEmpty()) {
+                    String hashedPassword = crypt.hashPassword(quiz.getPasswordQuiz());
+                    quiz.setPasswordQuiz(hashedPassword);
+                }
             }
 
             Utente u = logBeble.getUtente(token);

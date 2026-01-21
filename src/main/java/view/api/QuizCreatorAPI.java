@@ -1,6 +1,8 @@
 package view.api;
 
 import controller.menager.QuizCreatorMenager;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -27,10 +29,10 @@ public class QuizCreatorAPI {
     @Path("/upRole")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response upRole(@HeaderParam("Authorization") String authHeader){
+    public Response upRole(@HeaderParam("Authorization") String authHeader) {
         try {
-            if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
             }
             String token = authHeader.replace("Bearer ", "");
             String newToken = menager.upUserRole(token);
@@ -39,6 +41,12 @@ public class QuizCreatorAPI {
             response.put("token", newToken);
 
             return Response.ok(response).build();
+        } catch (MalformedJwtException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (JwtException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } catch (AppException e) {
             e.printStackTrace();
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -52,7 +60,7 @@ public class QuizCreatorAPI {
     public Response createQuiz(Quiz quiz, @HeaderParam("Authorization") String authHeader ) {
         try {
             if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.BAD_REQUEST).build();
             }
             String token = authHeader.replace("Bearer ", "");
             menager.createQuiz(quiz, token);
@@ -70,12 +78,16 @@ public class QuizCreatorAPI {
     public Response deleteQuiz(Quiz quiz, @HeaderParam("Authorization") String authHeader) {
         try {
             if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.BAD_REQUEST).build();
             }
             String token = authHeader.replace("Bearer ", "");
             menager.deleteQuiz(quiz, token);
+
             return Response.ok().build();
-        } catch (AppException e) {
+        } catch (MalformedJwtException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }  catch (AppException e) {
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -88,12 +100,16 @@ public class QuizCreatorAPI {
     public Response updateQuiz(Quiz quiz, @HeaderParam("Authorization") String authHeader) {
         try {
             if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.BAD_REQUEST).build();
             }
             String token = authHeader.replace("Bearer ", "");
             menager.aggiornaQuiz(quiz, token);
+
             return Response.ok().build();
-        } catch (AppException e) {
+        } catch (MalformedJwtException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }  catch (AppException e) {
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -106,7 +122,7 @@ public class QuizCreatorAPI {
     public Response getQuiz(@HeaderParam("Authorization") String authHeader, Map<String,String> body) {
         try {
             if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.BAD_REQUEST).build();
             }
             String token = authHeader.replace("Bearer ", "");
 
@@ -118,7 +134,10 @@ public class QuizCreatorAPI {
             int offset = Integer.parseInt(body.get("offset"));
             List<Quiz> quizList = menager.getQuizzes(page, offset, token);
             return Response.ok(quizList).build();
-        } catch (AppException e) {
+        } catch (MalformedJwtException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }  catch (AppException e) {
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).build();
         }

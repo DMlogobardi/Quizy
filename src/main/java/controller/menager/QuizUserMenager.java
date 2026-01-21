@@ -3,17 +3,15 @@ package controller.menager;
 import controller.utility.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityNotFoundException;
+import model.dao.FaDAO;
 import model.dao.QuizDAO;
-import model.entity.Domanda;
-import model.entity.Quiz;
-import model.entity.Risposta;
-import model.entity.Utente;
+import model.dao.RispondeDAO;
+import model.entity.*;
 import model.exception.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -33,6 +31,12 @@ public class QuizUserMenager {
 
     @Inject
     private QuizDAO dao;
+
+    @Inject
+    private FaDAO daoFa;
+
+    @Inject
+    private RispondeDAO daoRisponde;
 
     public QuizUserMenager() {
     }
@@ -75,6 +79,15 @@ public class QuizUserMenager {
             }
         }
         return punteggio;
+    }
+
+    private Boolean isComplete(Utente u, Quiz Quiz) {
+        try {
+            daoFa.findByUtenteQuiz(Quiz, u);
+            return true;
+        } catch (EntityNotFoundException e) {
+            return false;
+        }
     }
 
     public String downUserRole (String token) throws AppException {
@@ -138,7 +151,10 @@ public class QuizUserMenager {
                 throw new QuizUseException("impossibile accedere al quiz");
             }
 
-            return quiz.getDomande();
+            if(!isComplete(u, q))
+                return q.getDomande();
+            else
+                return null;
         } catch (TokenExpiredException e) {
             throw new QuizServiceException("token expired, logout forzato");
         } catch (AppException e) {
@@ -156,8 +172,10 @@ public class QuizUserMenager {
                 q = dao.findById(quiz.getId());
             }
 
-            return quiz.getDomande();
-
+            if(!isComplete(u, q))
+                return q.getDomande();
+            else
+                return null;
         } catch (TokenExpiredException e) {
             throw new QuizServiceException("token expired, logout forzato");
         } catch (AppException e) {
@@ -184,7 +202,16 @@ public class QuizUserMenager {
             if (domandeDb == null || risposteClient == null)
                 throw new AppException("liste mancanti");
 
-            return punteggioRisposta(domandeDb, risposteClient);
+            int punteggio = punteggioRisposta(domandeDb, risposteClient);
+            Fa fa = new Fa(u, quiz, punteggio);
+            List<Risponde> risposte = new ArrayList<>();
+            for (Risposta r : risposteClient) {
+                risposte.add(new Risponde(r, u, quizCorretto.getTitolo(), LocalDateTime.now()));
+            }
+            daoFa.insert(fa);
+            daoRisponde.insertAll(risposte);
+
+            return punteggio;
 
         } catch (TokenExpiredException e) {
             throw new QuizServiceException("token expired, logout forzato");

@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.EntityTransaction;
 import model.entity.Fa;
+import model.entity.Quiz;
 import model.entity.Utente;
 import model.exception.AppException;
 import model.exception.EmptyFild;
@@ -28,6 +29,13 @@ public class FaDAO {
             throw new AppException("id invalido");
         }
         return em.find(Fa.class, id);
+    }
+
+    public Fa findByUtenteQuiz(Quiz quiz, Utente u) throws EntityNotFoundException {
+        return em.createNamedQuery("Fa.findByUserAndQuiz", Fa.class)
+                .setParameter("utente", u)
+                .setParameter("quiz", quiz)
+                .getSingleResult();
     }
 
     public List<Fa> findAll(int pageNumber, int pageSize) throws AppException, EntityNotFoundException {

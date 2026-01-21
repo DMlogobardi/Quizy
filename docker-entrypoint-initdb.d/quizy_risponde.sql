@@ -27,7 +27,7 @@ CREATE TABLE `risponde` (
   `id_utente` int NOT NULL,
   `id_risposta` int NOT NULL,
   `quiz` varchar(200) NOT NULL,
-  `scelto_il` datetime(6) DEFAULT NULL,
+  `scelto_il` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `id_fa` int DEFAULT NULL,
   PRIMARY KEY (`id_risponde`),
   KEY `id_utente` (`id_utente`),

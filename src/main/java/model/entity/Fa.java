@@ -16,7 +16,8 @@ import java.util.List;
 @Table(name = "fa")
 @NamedQueries({
         @NamedQuery(name = "Fa.findAll", query = "SELECT fa FROM Fa fa"),
-        @NamedQuery(name = "Fa.findAllByUtente", query = "SELECT fa FROM Fa fa WHERE fa.utente = :utente")
+        @NamedQuery(name = "Fa.findAllByUtente", query = "SELECT fa FROM Fa fa WHERE fa.utente = :utente"),
+        @NamedQuery(name = "Fa.findByUserAndQuiz", query = "SELECT fa FROM Fa fa WHERE fa.utente = :utente AND fa.quiz = :quiz")
 })
 @XmlRootElement
 public class Fa implements Serializable {

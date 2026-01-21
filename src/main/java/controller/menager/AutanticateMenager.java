@@ -35,10 +35,6 @@ public class AutanticateMenager {
         try {
             Utente u = dao.findForLogin(username);
 
-            if (u == null) {
-                throw new LoginFailed("login fallito");
-            }
-
             if (!crypt.verificaPassword(password, u.getPasswordHash())) {
                 throw new LoginFailed("login fallito");
             }
@@ -50,8 +46,7 @@ public class AutanticateMenager {
 
         } catch (AppException e) {
             e.printStackTrace();
-            System.out.println(e.getMessage());
-            throw new LoginFailed("Errore durante l'autenticazione");
+            throw new LoginFailed(e.getMessage());
         }
     }
 

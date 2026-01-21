@@ -30,7 +30,7 @@ CREATE TABLE `quiz` (
   `titolo` varchar(200) NOT NULL,
   `descrizione` varchar(200) NOT NULL,
   `numero_domande` int DEFAULT NULL,
-  `creato_il` datetime(6) DEFAULT NULL,
+  `creato_il` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `password` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id_quiz`),
   UNIQUE KEY `unique_quiz_utente` (`id_utente`,`titolo`),
