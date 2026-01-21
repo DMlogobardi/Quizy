@@ -74,6 +74,30 @@ public class RispondeDAO {
         }
     }
 
+    public void insertAll(List<Risponde> listaRisposte) throws AppException, EmptyFild {
+        if (listaRisposte == null || listaRisposte.isEmpty()) {
+            throw new EmptyFild("La lista delle risposte è vuota o nulla");
+        }
+
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+
+            for (Risponde ris : listaRisposte) {
+                if (ris != null) {
+                    em.persist(ris);
+                }
+            }
+
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            // Nota: Assicurati che RegisterFailed sia una sottoclasse di AppException
+            throw new RegisterFailed("Errore durante l'inserimento della lista");
+        }
+    }
+
     public void update(Risponde ris) throws AppException, EmptyFild {
         if (ris == null) {
             throw new EmptyFild("Risponde invalido");

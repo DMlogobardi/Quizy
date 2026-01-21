@@ -1,6 +1,7 @@
 package view.api;
 
 import controller.menager.AutanticateMenager;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -84,12 +85,12 @@ public class AutanticateAPI {
     @Path("/newPassword")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response cambiapassword (Map<String,String> body, @HeaderParam("Authorization") String authHeader){
+    public Response cambiapassword (Map<String,String> body, @HeaderParam("Authorization") String authHeader) {
         try {
-            if(body == null || body.isEmpty()){
+            if (body == null || body.isEmpty()) {
                 return Response.status(Response.Status.NO_CONTENT).build();
             }
-            if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
             String token = authHeader.replace("Bearer ", "");
@@ -99,6 +100,9 @@ public class AutanticateAPI {
             auth.newPassword(password, oldPassword, token);
 
             return Response.ok().build();
+        } catch (MalformedJwtException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
         } catch (AppException e) {
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).build();
