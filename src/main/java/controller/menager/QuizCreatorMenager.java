@@ -137,6 +137,9 @@ public class QuizCreatorMenager {
     public List<Quiz> getQuizzes(int pageNumber, int pageSize, String token) throws QuizServiceException, InvalidRole {
         try {
             tokenCheck(token);
+            if(pageNumber < 0)
+                throw new QuizServiceException("pagina invalida");
+
             Utente u = logBeble.getUtente(token);
 
             List<Quiz> pagedQuizzes = quizLog.getQuizPaginati(u, pageNumber, pageSize);

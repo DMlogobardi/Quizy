@@ -113,6 +113,10 @@ public class QuizUserMenager {
     public List<Quiz> getQuizzes(int pageNumber, String token) throws QuizUseException, InvalidRole {
         try {
             tokenCheck(token);
+
+            if(pageNumber < 0)
+                throw new QuizUseException("pagina invalida");
+
             Utente u = logBeble.getUtente(token);
             int pageSize = 10;
             List<Quiz> pagedQuizzes = quizLog.getQuizPaginati(u, pageNumber, pageSize);
