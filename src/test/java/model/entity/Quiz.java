@@ -1,7 +1,6 @@
 package model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -35,7 +34,7 @@ public class Quiz implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "id_utente")
-    @JsonIgnoreProperties("domande")
+    @JsonBackReference("utente-quiz")
     private Utente utente;
 
     @Size(max = 50)
@@ -69,7 +68,7 @@ public class Quiz implements Serializable {
     private String passwordQuiz;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonIgnoreProperties("quiz")
+    @JsonManagedReference("quiz-domande")
     private List<Domanda> domande;
 
     public Quiz() {
