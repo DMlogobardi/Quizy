@@ -1,7 +1,6 @@
 package model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -32,7 +31,7 @@ public class Domanda implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_quiz", nullable = false)
-    @JsonIgnoreProperties("domande")
+    @JsonBackReference("quiz-domande")
     private Quiz quiz;
 
     @NotNull

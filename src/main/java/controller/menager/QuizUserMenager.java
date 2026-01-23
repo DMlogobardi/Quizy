@@ -179,9 +179,8 @@ public class QuizUserMenager {
             if( q == null) {
                 q = dao.findById(quiz.getId());
             }
-            System.out.println("Password quiz: " + q.getPasswordQuiz());
 
-            if( q.getPasswordQuiz() != null && !q.getPasswordQuiz().isBlank()) {
+            if (q.getPasswordQuiz() != null && !q.getPasswordQuiz().isBlank()) {
                 throw new QuizUseException("password is allowed");
             }
 
@@ -190,9 +189,9 @@ public class QuizUserMenager {
             else
                 return null;
         } catch (TokenExpiredException e) {
+            e.printStackTrace();
             throw new QuizServiceException("token expired, logout forzato");
         } catch (AppException e) {
-            e.printStackTrace();
             throw new QuizServiceException("Error getting quizzes");
         }
     }

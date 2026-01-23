@@ -69,7 +69,7 @@ public class Quiz implements Serializable {
     private String passwordQuiz;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonIgnoreProperties("quiz")
+    @JsonManagedReference("quiz-domande")
     private List<Domanda> domande;
 
     public Quiz() {
