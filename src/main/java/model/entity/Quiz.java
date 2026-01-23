@@ -1,6 +1,7 @@
 package model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -68,7 +69,7 @@ public class Quiz implements Serializable {
     private String passwordQuiz;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference("quiz-domande")
+    @JsonIgnoreProperties("quiz")
     private List<Domanda> domande;
 
     public Quiz() {
