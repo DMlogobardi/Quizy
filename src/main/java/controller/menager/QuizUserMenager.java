@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.NoResultException;
+import jakarta.transaction.Transactional;
 import model.dao.FaDAO;
 import model.dao.QuizDAO;
 import model.dao.RispondeDAO;
@@ -17,6 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
+@Transactional
 public class QuizUserMenager {
 
     @Inject
