@@ -184,8 +184,10 @@ public class QuizUserMenager {
                 throw new QuizUseException("password is allowed");
             }
 
+            List<Domanda> domande = q.getDomande();
+
             if(!isComplete(u, q))
-                return q.getDomande();
+                return domande;
             else
                 return null;
         } catch (TokenExpiredException e) {
