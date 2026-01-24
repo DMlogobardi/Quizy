@@ -185,6 +185,19 @@ public class QuizUserMenager {
             }
 
             List<Domanda> domande = q.getDomande();
+            if (domande != null) {
+                // QUESTA RIGA È FONDAMENTALE:
+                // Obbliga Hibernate a fare la SELECT sul database ADESSO.
+                domande.size();
+
+                // Se vuoi che su Android arrivino anche le opzioni (A, B, C, D),
+                // devi toccare anche quelle perché sono anch'esse Lazy:
+                for(Domanda d : domande) {
+                    if(d.getRisposte() != null) {
+                        d.getRisposte().size();
+                    }
+                }
+            }
 
             if(!isComplete(u, q))
                 return domande;
