@@ -10,6 +10,7 @@ import model.dao.QuizDAO;
 import model.dao.RispondeDAO;
 import model.entity.*;
 import model.exception.*;
+import org.hibernate.Hibernate;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -184,24 +185,17 @@ public class QuizUserMenager {
                 throw new QuizUseException("password is allowed");
             }
 
-            List<Domanda> domande = q.getDomande();
-            if (domande != null) {
-                // QUESTA RIGA È FONDAMENTALE:
-                // Obbliga Hibernate a fare la SELECT sul database ADESSO.
-                domande.size();
+            if (!isComplete(u, q)) {
+                List<Domanda> domande = q.getDomande();
 
-                // Se vuoi che su Android arrivino anche le opzioni (A, B, C, D),
-                // devi toccare anche quelle perché sono anch'esse Lazy:
+                Hibernate.initialize(domande);
+
                 for(Domanda d : domande) {
-                    if(d.getRisposte() != null) {
-                        d.getRisposte().size();
-                    }
+                    Hibernate.initialize(d.getRisposte());
                 }
-            }
 
-            if(!isComplete(u, q))
                 return domande;
-            else
+            } else
                 return null;
         } catch (TokenExpiredException e) {
             e.printStackTrace();
