@@ -150,6 +150,10 @@ public class Quiz implements Serializable {
     }
 
     public List<Domanda> getDomande() {
+        if (this.domande != null) {
+            // Forza l'inizializzazione della lista
+            this.domande.size();
+        }
         return domande;
     }
 
