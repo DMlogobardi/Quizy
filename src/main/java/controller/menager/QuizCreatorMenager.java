@@ -134,7 +134,7 @@ public class QuizCreatorMenager {
         }
     }
 
-    public List<Quiz> getQuizzes(int pageNumber, int pageSize, String token) throws QuizServiceException, InvalidRole {
+    public List<Quiz> getQuizzes(int pageNumber, String token) throws QuizServiceException, InvalidRole {
         try {
             tokenCheck(token);
             if(pageNumber < 0)
@@ -142,10 +142,12 @@ public class QuizCreatorMenager {
 
             Utente u = logBeble.getUtente(token);
 
+            int pageSize = 10;
+
             List<Quiz> pagedQuizzes = quizLog.getQuizPaginati(u, pageNumber, pageSize);
 
             if (pagedQuizzes.isEmpty()) {
-                pagedQuizzes = dao.findAllByUtente(pageNumber, pageSize, u);
+                pagedQuizzes = dao.findAllByUtente(pageNumber, u);
 
                 if(pagedQuizzes != null && !pagedQuizzes.isEmpty()) {
                     for (Quiz quiz : pagedQuizzes) {

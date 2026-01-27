@@ -43,13 +43,11 @@ public class QuizDAO {
                 .getResultList();
     }
 
-    public List<Quiz> findAllByUtente(int pageNumber, int pageSize, Utente utente) throws EntityNotFoundException, EmptyFild {
+    public List<Quiz> findAllByUtente(int pageNumber, Utente utente) throws EntityNotFoundException, EmptyFild {
         if (utente == null) {
             throw new EmptyFild("Utente invalido");
         }
-        if (pageNumber <= 0 || pageSize <= 0) {
-            throw new AppException("Pagina invalida");
-        }
+        int pageSize = 10;
 
         return em.createNamedQuery("Quiz.findAllByUtente", Quiz.class)
                 .setParameter("utente", utente)

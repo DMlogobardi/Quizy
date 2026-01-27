@@ -131,8 +131,7 @@ public class QuizCreatorAPI {
             }
 
             int page = Integer.parseInt(body.get("page"));
-            int offset = Integer.parseInt(body.get("offset"));
-            List<Quiz> quizList = menager.getQuizzes(page, offset, token);
+            List<Quiz> quizList = menager.getQuizzes(page, token);
             return Response.ok(quizList).build();
         } catch (MalformedJwtException e) {
             e.printStackTrace();

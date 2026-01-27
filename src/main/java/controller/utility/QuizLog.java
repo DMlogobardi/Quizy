@@ -56,7 +56,6 @@ public class QuizLog {
         if (userQuizzes == null || userQuizzes.isEmpty()) {
             return new ArrayList<>();
         }
-
         // Trasformiamo i valori in lista e li ordiniamo per ID
         // Questo garantisce che la paginazione sia coerente
         int offset = pageNumber * pageSize;
