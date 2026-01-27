@@ -76,6 +76,7 @@ public class QuizCreatorMenager {
             if (quiz.getDomande() != null) {
                 for (Domanda domanda : quiz.getDomande()) {
                     domanda.setQuiz(quiz);
+                    domanda.setId(null);
 
                     if (domanda.getRisposte() != null) {
                         for (Risposta risposta : domanda.getRisposte()) {
