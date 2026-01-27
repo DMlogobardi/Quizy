@@ -80,6 +80,7 @@ public class QuizCreatorMenager {
                     if (domanda.getRisposte() != null) {
                         for (Risposta risposta : domanda.getRisposte()) {
                             risposta.setDomanda(domanda);
+                            risposta.setId(null);
                         }
                     }
                 }
