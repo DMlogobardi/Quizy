@@ -1,17 +1,23 @@
 package controller.utility;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import model.entity.Quiz;
 import model.entity.Utente;
 import model.exception.AppException;
+import model.mapper.EntityRefresher;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Singleton
 public class QuizLog {
+
+    @Inject
+    private EntityRefresher refresher;
 
     private final Map<Utente, Map<Integer, Quiz>> logQuizBible = new ConcurrentHashMap<>();
 
@@ -36,7 +42,10 @@ public class QuizLog {
             throw new AppException("Quiz non presenti");
         }
 
-        return new ArrayList<>(userQuizzes.values());
+        // MODIFICA: Uso stream per riagganciare ogni quiz
+        return userQuizzes.values().stream()
+                .map(quiz -> refresher.reattach(quiz))
+                .collect(Collectors.toList());
     }
 
     public void clearQuiz(Utente utente) throws AppException {
@@ -48,7 +57,8 @@ public class QuizLog {
 
         Quiz quiz = userQuizzes != null ? userQuizzes.get(id) : null;
 
-        return quiz;
+        // MODIFICA: Restituisco l'oggetto riagganciato (o null)
+        return refresher.reattach(quiz);
     }
 
     public List<Quiz> getQuizPaginati(Utente utente, int pageNumber, int pageSize) {
@@ -57,14 +67,15 @@ public class QuizLog {
             return new ArrayList<>();
         }
 
-        // Trasformiamo i valori in lista e li ordiniamo per ID
-        // Questo garantisce che la paginazione sia coerente
+
         int offset = pageNumber * pageSize;
 
+        // MODIFICA: Aggiunto .map(refresher::reattach) dopo il limit
         return userQuizzes.values().stream()
-                .sorted((q1, q2) -> Integer.compare(q1.getId(), q2.getId())) // Ordinamento stabile
-                .skip(offset)                                              // Salta i risultati precedenti
-                .limit(pageSize)                                           // Prende solo la pagina richiesta
+                .sorted((q1, q2) -> Integer.compare(q1.getId(), q2.getId()))
+                .skip(offset)
+                .limit(pageSize)
+                .map(quiz -> refresher.reattach(quiz)) // <--- QUI
                 .toList();
     }
 }
