@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import model.dto.GetQuizDTO;
 import model.entity.Quiz;
 import model.exception.AppException;
 
@@ -119,19 +120,18 @@ public class QuizCreatorAPI {
     @Path("/getQuiz")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getQuiz(@HeaderParam("Authorization") String authHeader, Map<String,String> body) {
+    public Response getQuiz(@HeaderParam("Authorization") String authHeader, GetQuizDTO page) {
         try {
             if(authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
             String token = authHeader.replace("Bearer ", "");
 
-            if (body == null || body.isEmpty()) {
+            if (page == null) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
 
-            int page = Integer.parseInt(body.get("page"));
-            List<Quiz> quizList = menager.getQuizzes(page, token);
+            List<Quiz> quizList = menager.getQuizzes(page.getPage(), token);
             return Response.ok(quizList).build();
         } catch (MalformedJwtException e) {
             e.printStackTrace();
