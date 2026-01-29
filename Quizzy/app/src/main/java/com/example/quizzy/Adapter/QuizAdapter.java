@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,10 +21,14 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
 
     private List<ListQuizDTO> quizList;
     private String token;
+    private QuizActionListener listener;
 
-    public QuizAdapter(List<ListQuizDTO> quizList, String token) {
+
+    public QuizAdapter(List<ListQuizDTO> quizList, String token, QuizActionListener listener) {
         this.quizList = quizList;
         this.token = token;
+        this.listener = listener;
+
     }
 
     @NonNull
@@ -44,15 +49,32 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
             Intent intent = new Intent(context, QuizGameActivity.class);
             intent.putExtra("QUIZ_ID", quiz.getId()); // Passiamo l'ID del quiz selezionato
             intent.putExtra("token", token);          // Passiamo il token utente
-
             // Avviamo l'activity
             context.startActivity(intent);
+        });
+
+        // cestino
+        holder.btnDelete.setOnClickListener(v -> {
+            if (listener != null) {
+                // Passiamo l'ID del quiz e la posizione nella lista
+                listener.onDeleteClick(quiz.getId(), holder.getAdapterPosition());
+            }
         });
     }
 
     @Override
     public int getItemCount() {
         return quizList.size();
+    }
+
+
+    // Metodo per rimuovere visivamente l'elemento dopo che il server ha detto OK
+    public void removeItem(int position) {
+        if (position >= 0 && position < quizList.size()) {
+            quizList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, quizList.size());
+        }
     }
 
     // Metodi per aggiornare la lista (nessuna modifica qui)
@@ -70,10 +92,13 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
 
     static class QuizViewHolder extends RecyclerView.ViewHolder {
         TextView nomeQuiz;
+        ImageView btnDelete;
+
 
         public QuizViewHolder(@NonNull View itemView) {
             super(itemView);
             nomeQuiz = itemView.findViewById(R.id.nome_quiz_row);
+            btnDelete = itemView.findViewById(R.id.btn_delete); // <--- NUOVO
         }
     }
 }

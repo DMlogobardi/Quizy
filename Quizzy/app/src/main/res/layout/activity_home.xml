@@ -100,7 +100,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="0dp">
 
-        <!-- i seguenti due TextView si trovano nel menù -->
+        <!-- i seguenti quattro TextView si trovano nel menù -->
+
+        <TextView
+            android:id="@+id/menu_crea_quiz"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Crea Nuovo Quiz"
+            android:textColor="#000000"
+            android:padding="12dp"
+            android:background="#B0B0B0"
+            android:gravity="center_vertical"
+            android:visibility="gone"/>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#000000"/>
+
+
+
         <TextView
             android:id="@+id/menu_cambio_ruolo"
             android:layout_width="match_parent"
@@ -110,7 +126,7 @@
             android:padding="12dp"
             android:background="#B0B0B0"
             android:gravity="center_vertical"
-            android:onClick="eseguiCambioRuolo"/>
+            />
 
         <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#000000"/>
 
@@ -120,6 +136,19 @@
             android:layout_height="wrap_content"
             android:text="Visualizza quiz"
             android:textColor="#000000"
+            android:padding="12dp"
+            android:background="#B0B0B0"
+            android:gravity="center_vertical"/>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#000000"/>
+
+        <TextView
+            android:id="@+id/menu_logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Logout"
+            android:textColor="#D32F2F"
+            android:textStyle="bold"
             android:padding="12dp"
             android:background="#B0B0B0"
             android:gravity="center_vertical"/>

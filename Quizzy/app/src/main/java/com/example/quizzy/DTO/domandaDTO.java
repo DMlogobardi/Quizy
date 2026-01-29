@@ -1,5 +1,7 @@
 package com.example.quizzy.DTO;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -8,7 +10,8 @@ import java.util.List;
 public class domandaDTO {
 
     @SerializedName("id")
-    private int id;
+    @Nullable
+    private Integer id;
 
     @SerializedName("quesito")
     private String quesito;

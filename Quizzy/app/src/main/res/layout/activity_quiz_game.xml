@@ -37,9 +37,6 @@
         app:layout_constraintTop_toBottomOf="@id/text_quesito"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- I RadioButton per le risposte verranno aggiunti dinamicamente -->
-
     </RadioGroup>
 
     <LinearLayout
@@ -53,20 +50,30 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <Button
-            android:id="@+id/button_termina"
+            android:id="@+id/button_precedente"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Termina Quiz"
-            android:layout_marginEnd="8dp"/>
+            android:text="Indietro"
+            android:layout_marginEnd="4dp"
+            android:enabled="false" /> <Button
+        android:id="@+id/button_termina"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Fine"
+        android:backgroundTint="#D32F2F"
+        android:textColor="@android:color/white"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"/>
 
         <Button
             android:id="@+id/button_prossima"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Prossima"
-            android:layout_marginStart="8dp"/>
+            android:text="Avanti"
+            android:layout_marginStart="4dp"/>
 
     </LinearLayout>
 

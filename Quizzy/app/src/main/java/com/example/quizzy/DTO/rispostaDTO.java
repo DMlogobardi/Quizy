@@ -1,10 +1,13 @@
 package com.example.quizzy.DTO;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.annotations.SerializedName;
 
 public class rispostaDTO {
     @SerializedName("id")
-    private int id;
+    @Nullable
+    private Integer id;
 
 
     @SerializedName("affermazione")

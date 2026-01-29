@@ -1,5 +1,8 @@
 package com.example.quizzy.Utility;
 
+import com.example.quizzy.DTO.CompletaQuizRequest;
+import com.example.quizzy.DTO.CompletaQuizResponse;
+import com.example.quizzy.DTO.DeleteQuizRequest;
 import com.example.quizzy.DTO.GetQuizUserRequest;
 import com.example.quizzy.DTO.ListQuizDTO;
 import com.example.quizzy.DTO.LoginRequest;
@@ -8,6 +11,7 @@ import com.example.quizzy.DTO.QuizDTO;
 import com.example.quizzy.DTO.RegistrazioneRequest;
 import com.example.quizzy.DTO.StartQuizNoPassRequest;
 import com.example.quizzy.DTO.UpRoleResponse;
+import com.example.quizzy.DTO.UpdateQuizRequest;
 import com.example.quizzy.DTO.domandaDTO;
 
 import java.util.List;
@@ -21,7 +25,8 @@ public interface ApiService {
     @POST("auth/login")
     Call<LoginResponse> login(@Body LoginRequest loginRequest);
     // login (@Hader("Authorization") String token, @Body (DTO che mi creo))
-    //
+    @POST("auth/logout")
+    Call<Void> logout(@Header("Authorization") String token);
     @POST("auth/register")
     Call<Void> registrazione(@Body RegistrazioneRequest registrazioneRequest);
 
@@ -33,8 +38,8 @@ public interface ApiService {
     @POST("quiz-manage/create")
     Call<Void> createQuiz(@Header("Authorization") String token, @Body QuizDTO quiz);
 
-    @POST("quiz-manage/getQuiz") // O GET, controlla la documentazione se accetta body
-    Call<QuizDTO> getQuiz(@Header("Authorization") String token);
+    @POST("quiz-manage/getQuiz")
+    Call<List<ListQuizDTO>> getQuizListCreator(@Header("Authorization") String token, @Body GetQuizUserRequest request);
 
 
 
@@ -43,6 +48,15 @@ public interface ApiService {
 
     @POST("quiz-use/startQuiz")
     Call<List<domandaDTO>> startQuiz(@Header("Authorization") String token, @Body StartQuizNoPassRequest request);
+
+    @POST("quiz-use/completa")
+    Call<CompletaQuizResponse> completaQuiz(@Header("Authorization") String token, @Body CompletaQuizRequest request);
+
+    @POST("quiz-manage/delete")
+    Call<Void> deleteQuiz(@Header("Authorization") String token, @Body DeleteQuizRequest request);
+
+    @POST("quiz-manage/update")
+    Call<Void> updateQuiz(@Header("Authorization") String token, @Body UpdateQuizRequest request);
 
 }
 

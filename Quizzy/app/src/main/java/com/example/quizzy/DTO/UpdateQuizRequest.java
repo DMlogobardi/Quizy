@@ -1,16 +1,13 @@
 package com.example.quizzy.DTO;
 
-import androidx.annotation.Nullable;
-
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-public class QuizDTO {
-
+public class UpdateQuizRequest {
     @SerializedName("id")
-    @Nullable
-    private Integer id;
+    private int id;
+
     @SerializedName("titolo")
     private String titolo;
 
@@ -32,16 +29,8 @@ public class QuizDTO {
     @SerializedName("domande")
     private ArrayList<domandaDTO> domande = new ArrayList<>();
 
-    public QuizDTO(String titolo, String descrizione, String difficolta, String tempo, int numeroDomande, String passwordQuiz) {
-        this.titolo = titolo;
-        this.descrizione = descrizione;
-        this.difficolta = difficolta;
-        this.tempo = tempo;
-        this.numeroDomande = numeroDomande;
-        this.passwordQuiz = passwordQuiz;
-    }
-
-    public QuizDTO(String titolo, String descrizione, String difficolta, String tempo, int numeroDomande, String passwordQuiz, ArrayList<domandaDTO> domande) {
+    public UpdateQuizRequest(int id, String titolo, String descrizione, String difficolta, String tempo, int numeroDomande, String passwordQuiz, ArrayList<domandaDTO> domande) {
+        this.id = id;
         this.titolo = titolo;
         this.descrizione = descrizione;
         this.difficolta = difficolta;
@@ -51,22 +40,12 @@ public class QuizDTO {
         this.domande = domande;
     }
 
-    public domandaDTO addDomanda(domandaDTO domanda){
-        this.domande.add(domanda);
-        return domanda;
+    public int getId() {
+        return id;
     }
 
-    public domandaDTO removeDomanda(domandaDTO domanda){
-        this.domande.remove(domanda);
-        return domanda;
-    }
-
-    public ArrayList<domandaDTO> getDomande() {
-        return domande;
-    }
-
-    public void setDomande(ArrayList<domandaDTO> domande) {
-        this.domande = domande;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitolo() {
@@ -115,5 +94,13 @@ public class QuizDTO {
 
     public void setPasswordQuiz(String passwordQuiz) {
         this.passwordQuiz = passwordQuiz;
+    }
+
+    public ArrayList<domandaDTO> getDomande() {
+        return domande;
+    }
+
+    public void setDomande(ArrayList<domandaDTO> domande) {
+        this.domande = domande;
     }
 }
