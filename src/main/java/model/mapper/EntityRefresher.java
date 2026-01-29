@@ -18,16 +18,4 @@ public class EntityRefresher {
 
         return em.merge(entity);
     }
-
-
-    public <T> T reattachAndLoad(T entity, Consumer<T> loader) {
-        if (entity == null) return null;
-
-        // 1. Riaggancia
-        T managedEntity = em.merge(entity);
-
-        loader.accept(managedEntity);
-
-        return managedEntity;
-    }
 }
