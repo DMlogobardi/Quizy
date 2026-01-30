@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quizzy.Activity.EditQuizActivity;
@@ -66,11 +67,14 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
         } else {
             holder.itemView.setOnClickListener(v -> {
                 Context context = v.getContext();
-                Intent intent = new Intent(context, QuizGameActivity.class);
-                intent.putExtra("QUIZ_ID", quiz.getId()); // Passiamo l'ID del quiz selezionato
-                intent.putExtra("token", token);          // Passiamo il token utente
-                // Avviamo l'activity
-                context.startActivity(intent);
+
+                // CONTROLLO PASSWORD
+                if (quiz.isPasswordRichiesta()) {
+                    mostraDialogPassword(context, quiz);
+                } else {
+                    // Avvio normale senza password
+                    avviaGioco(context, quiz.getId(), null);
+                }
             });
         }
         
@@ -82,6 +86,39 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
             }
         });
     }
+
+
+    private void mostraDialogPassword(Context context, ListQuizDTO quiz) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Quiz Protetto");
+        builder.setMessage("Inserisci la password per iniziare:");
+
+        // Creiamo un EditText dinamicamente
+        final android.widget.EditText input = new android.widget.EditText(context);
+        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);        builder.setView(input);
+
+        builder.setPositiveButton("Entra", (dialog, which) -> {
+            String passwordInserita = input.getText().toString();
+            avviaGioco(context, quiz.getId(), passwordInserita);
+        });
+
+        builder.setNegativeButton("Annulla", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void avviaGioco(Context context, int quizId, String password) {
+        Intent intent = new Intent(context, QuizGameActivity.class);
+        intent.putExtra("QUIZ_ID", quizId);
+        intent.putExtra("token", token);
+        if (password != null) {
+            intent.putExtra("QUIZ_PASSWORD", password);
+        }
+        context.startActivity(intent);
+    }
+
+
+
+
 
     @Override
     public int getItemCount() {

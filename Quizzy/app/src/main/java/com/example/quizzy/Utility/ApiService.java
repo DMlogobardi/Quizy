@@ -41,13 +41,14 @@ public interface ApiService {
     @POST("quiz-manage/getQuiz")
     Call<List<ListQuizDTO>> getQuizListCreator(@Header("Authorization") String token, @Body GetQuizUserRequest request);
 
-
-
     @POST("quiz-use/getQuiz")
     Call<List<ListQuizDTO>> getQuizListUser(@Header("Authorization") String token, @Body GetQuizUserRequest getQuizUserRequest);
 
     @POST("quiz-use/startQuiz")
     Call<List<domandaDTO>> startQuiz(@Header("Authorization") String token, @Body StartQuizNoPassRequest request);
+
+    @POST("quiz-use/startQuiz_password")
+    Call<List<domandaDTO>> starQuizPassword(@Header("Authorization") String token, @Body StartQuizNoPassRequest request);
 
     @POST("quiz-use/completa")
     Call<CompletaQuizResponse> completaQuiz(@Header("Authorization") String token, @Body CompletaQuizRequest request);

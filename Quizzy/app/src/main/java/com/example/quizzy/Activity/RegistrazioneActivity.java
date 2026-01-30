@@ -48,7 +48,6 @@ public class RegistrazioneActivity extends AppCompatActivity {
 
                 if(response.isSuccessful() ){
 
-                    // passo activity
                     Intent intent = new Intent(ctx, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

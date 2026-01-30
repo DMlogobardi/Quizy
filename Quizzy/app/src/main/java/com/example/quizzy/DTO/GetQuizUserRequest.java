@@ -2,7 +2,6 @@ package com.example.quizzy.DTO;
 
 import com.google.gson.annotations.SerializedName;
 
-// GetQuizUserRequest.java
 public class GetQuizUserRequest {
     @SerializedName("page")
     private int page;

@@ -44,16 +44,15 @@ public class QuizGameActivity extends AppCompatActivity {
     private final List<domandaDTO> listaDomande = new ArrayList<>();
     // Mappa per salvare le risposte: <ID_Domanda, ID_Risposta_Selezionata>
     private final Map<Integer, Integer> risposteDate = new HashMap<>();
-
-    private int index = 0; // Indice della domanda corrente
+    private int index = 0;
     private String userToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz_game);
+        String passwordRicevuta = getIntent().getStringExtra("QUIZ_PASSWORD");
 
-        // Recupero dati dall'Intent
         quizId = getIntent().getIntExtra("QUIZ_ID", -1);
         userToken = getIntent().getStringExtra("token");
 
@@ -64,43 +63,48 @@ public class QuizGameActivity extends AppCompatActivity {
 
         if (!userToken.startsWith("Bearer ")) userToken = "Bearer " + userToken;
 
-        // Binding delle View
         textQuesito = findViewById(R.id.text_quesito);
         radioGroupRisposte = findViewById(R.id.radio_group_risposte);
 
-        // Binding dei 3 pulsanti dal layout XML
         btnPrecedente = findViewById(R.id.button_precedente);
         btnProssima = findViewById(R.id.button_prossima);
         btnTermina = findViewById(R.id.button_termina);
 
-        // Setup Listeners
         btnPrecedente.setOnClickListener(v -> vaiAllaDomandaPrecedente());
         btnProssima.setOnClickListener(v -> vaiAllaDomandaSuccessiva());
         btnTermina.setOnClickListener(v -> confermaTerminaQuiz());
 
-        // Chiamata Server
         caricaDomande(quizId);
     }
 
     private void caricaDomande(int quizId) {
-        RetrofitInstance.getService().startQuiz(userToken, new StartQuizNoPassRequest(quizId))
-                .enqueue(new Callback<List<domandaDTO>>() {
-                    @Override
-                    public void onResponse(Call<List<domandaDTO>> call, Response<List<domandaDTO>> r) {
-                        if (r.isSuccessful() && r.body() != null && !r.body().isEmpty()) {
-                            listaDomande.addAll(r.body());
-                            mostraDomanda(); // Mostra la prima domanda
-                        } else {
-                            Toast.makeText(QuizGameActivity.this, "Errore caricamento o quiz vuoto", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                    }
-                    @Override
-                    public void onFailure(Call<List<domandaDTO>> call, Throwable t) {
-                        Toast.makeText(QuizGameActivity.this, "Errore di connessione", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                });
+        String passwordRicevuta = getIntent().getStringExtra("QUIZ_PASSWORD");
+        Call<List<domandaDTO>> call;
+
+        if (passwordRicevuta != null && !passwordRicevuta.isEmpty()) {
+            // Usa l'endpoint con password
+            call = RetrofitInstance.getService().starQuizPassword(userToken, new StartQuizNoPassRequest(quizId, passwordRicevuta));
+        } else {
+            // Usa l'endpoint senza password
+            call = RetrofitInstance.getService().startQuiz(userToken, new StartQuizNoPassRequest(quizId));
+        }
+
+        call.enqueue(new Callback<List<domandaDTO>>() {
+            @Override
+            public void onResponse(Call<List<domandaDTO>> call, Response<List<domandaDTO>> r) {
+                if (r.isSuccessful() && r.body() != null) {
+                    listaDomande.addAll(r.body());
+                    mostraDomanda();
+                } else {
+                    Toast.makeText(QuizGameActivity.this, "Password errata o errore caricamento", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+            @Override
+            public void onFailure(Call<List<domandaDTO>> call, Throwable t) {
+                finish();
+            }
+        });
     }
 
     private void mostraDomanda() {
@@ -109,7 +113,6 @@ public class QuizGameActivity extends AppCompatActivity {
         domandaDTO d = listaDomande.get(index);
         textQuesito.setText(d.getQuesito());
 
-        // Pulizia e generazione dinamica RadioButton
         radioGroupRisposte.removeAllViews();
         radioGroupRisposte.clearCheck();
 
@@ -128,11 +131,9 @@ public class QuizGameActivity extends AppCompatActivity {
             }
         }
 
-        // Aggiorna lo stato (abilitato/disabilitato) dei pulsanti
         aggiornaStatoBottoni();
     }
 
-    // Metodo helper per salvare la scelta corrente prima di cambiare pagina
     private void salvaRispostaCorrente() {
         if (listaDomande.isEmpty()) return;
 
@@ -140,16 +141,15 @@ public class QuizGameActivity extends AppCompatActivity {
         domandaDTO domandaCorrente = listaDomande.get(index);
 
         if (selectedId != -1) {
-            // Salva o aggiorna la risposta nella mappa
             risposteDate.put(domandaCorrente.getId(), selectedId);
         } else {
-            // Opzionale: se l'utente deseleziona o non risponde, potresti voler rimuovere la risposta precedente
+            // in futuro se l'utente deseleziona o non risponde, potresti voler rimuovere la risposta precedente
             // risposteDate.remove(domandaCorrente.getId());
         }
     }
 
     private void vaiAllaDomandaSuccessiva() {
-        salvaRispostaCorrente(); // Importante salvare prima di cambiare indice
+        salvaRispostaCorrente();
         if (index < listaDomande.size() - 1) {
             index++;
             mostraDomanda();
@@ -157,26 +157,23 @@ public class QuizGameActivity extends AppCompatActivity {
     }
 
     private void vaiAllaDomandaPrecedente() {
-        salvaRispostaCorrente(); // Salviamo anche se torna indietro (magari ha cambiato idea)
+        salvaRispostaCorrente();
         if (index > 0) {
             index--;
             mostraDomanda();
         }
     }
 
-    // AGGIUNGI QUESTO METODO
     private void confermaTerminaQuiz() {
-        salvaRispostaCorrente(); // Salva l'ultima risposta data, se c'è
+        salvaRispostaCorrente();
 
-        // Mostra un popup di conferma
         new AlertDialog.Builder(this)
                 .setTitle("Conferma invio")
                 .setMessage("Sei sicuro di voler terminare il quiz? Non potrai più cambiare le risposte.")
                 .setPositiveButton("Sì, invia", (dialog, which) -> {
-                    // Solo se l'utente dice SÌ, chiamiamo il server
                     inviaRisposteAlServer();
                 })
-                .setNegativeButton("No", null) // Se dice NO, non facciamo nulla
+                .setNegativeButton("No", null)
                 .show();
     }
 
@@ -191,17 +188,13 @@ public class QuizGameActivity extends AppCompatActivity {
 
     // Parte che mostra il punteggio
     private void inviaRisposteAlServer() {
-        // 1. Prepariamo la lista complessa richiesta dal JSON
         List<CompletaQuizRequest.RispostaClient> listaRisposteJson = new ArrayList<>();
 
-        // Cicliamo su tutte le domande del quiz
         for (domandaDTO domanda : listaDomande) {
 
-            // Controlliamo se l'utente ha risposto a questa domanda
             if (risposteDate.containsKey(domanda.getId())) {
                 int idRispostaScelta = risposteDate.get(domanda.getId());
 
-                // Dobbiamo recuperare l'oggetto rispostaDTO completo per avere "affermazione" e "flag"
                 rispostaDTO rispostaOriginale = null;
                 for (rispostaDTO r : domanda.getRisposte()) {
                     if (r.getId() == idRispostaScelta) {
@@ -209,29 +202,24 @@ public class QuizGameActivity extends AppCompatActivity {
                         break;
                     }
                 }
-
-                // Se abbiamo trovato i dati, creiamo l'oggetto per il JSON
                 if (rispostaOriginale != null) {
                     CompletaQuizRequest.RispostaClient rispostaClient = new CompletaQuizRequest.RispostaClient(
-                            rispostaOriginale.getId(),          // id risposta
-                            domanda.getId(),                    // id domanda
-                            rispostaOriginale.getAffermazione(), // testo
-                            rispostaOriginale.getFlagRispostaCorretta() // flag boolean
+                            rispostaOriginale.getId(),
+                            domanda.getId(),
+                            rispostaOriginale.getAffermazione(),
+                            rispostaOriginale.getFlagRispostaCorretta()
                     );
                     listaRisposteJson.add(rispostaClient);
                 }
             }
         }
 
-        // 2. Creiamo la richiesta principale col "quizId" e la lista
         CompletaQuizRequest request = new CompletaQuizRequest(quizId, listaRisposteJson);
 
-        // 3. Chiamata Retrofit
         RetrofitInstance.getService().completaQuiz(userToken, request).enqueue(new Callback<CompletaQuizResponse>() {
             @Override
             public void onResponse(Call<CompletaQuizResponse> call, Response<CompletaQuizResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // 200 OK - Mostriamo il punteggio
                     mostraDialogRisultato(response.body().getPunteggio());
                 } else {
                     Toast.makeText(QuizGameActivity.this, "Errore invio: " + response.code(), Toast.LENGTH_SHORT).show();

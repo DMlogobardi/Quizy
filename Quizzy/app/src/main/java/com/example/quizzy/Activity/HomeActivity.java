@@ -109,12 +109,10 @@ public class HomeActivity extends AppCompatActivity {
 
                     Toast.makeText(HomeActivity.this, "Ruolo aggiornato! Ora puoi creare ed eliminare.", Toast.LENGTH_LONG).show();
 
-
                 } else {
                     Toast.makeText(HomeActivity.this, "Errore: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onFailure(Call<UpRoleResponse> call, Throwable t) {
                 Toast.makeText(HomeActivity.this, "Errore di rete", Toast.LENGTH_SHORT).show();
@@ -126,7 +124,6 @@ public class HomeActivity extends AppCompatActivity {
         menuIcon.setOnClickListener(v -> toggleMenu());
 
         btnCambioRuolo.setOnClickListener(v -> eseguiCambioRuolo(v));
-
         btnCreaQuiz.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, CreazioneActivity.class);
             intent.putExtra("token", userToken);
@@ -232,33 +229,6 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-
-
-
-
-    /*
-    private void caricaQuiz(boolean pulisciLista) {
-        GetQuizUserRequest request = new GetQuizUserRequest(paginaCorrente);
-        RetrofitInstance.getService().getQuizListUser(userToken, request).enqueue(new Callback<List<ListQuizDTO>>() {
-            @Override
-            public void onResponse(Call<List<ListQuizDTO>> call, Response<List<ListQuizDTO>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    if (pulisciLista) quizAdapter.updateData(response.body());
-                    else quizAdapter.addData(response.body());
-
-                    if (!response.body().isEmpty()) btnPaginaSuccessiva.setVisibility(View.VISIBLE);
-                    else btnPaginaSuccessiva.setVisibility(View.GONE);
-                }
-            }
-            @Override
-            public void onFailure(Call<List<ListQuizDTO>> call, Throwable t) {
-                Toast.makeText(HomeActivity.this, "Errore caricamento", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-    */
-
-
     public void toggleMenu() {
         if (menuTendina.getVisibility() == View.VISIBLE) {
             menuTendina.setVisibility(View.GONE);
@@ -270,16 +240,11 @@ public class HomeActivity extends AppCompatActivity {
 
     // LogOut
     private void performLogout() {
-        // 1. Controlla se abbiamo il token
         if (userToken == null) {
-            // Se non c'è token, pulisci tutto ed esci direttamente
             clearLocalDataAndExit();
             return;
         }
 
-        // 2. Chiama l'endpoint di Logout del server
-        // Nota: userToken deve già contenere "Bearer " + stringa, o glielo aggiungi qui
-        // Se userToken è solo la stringa raw, usa: "Bearer " + userToken
         RetrofitInstance.getService().logout(userToken).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -295,18 +260,14 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    // Metodo di supporto per pulire e chiudere
     private void clearLocalDataAndExit() {
-        // 1. Cancella le SharedPreferences
         getSharedPreferences("QuizzyPrefs", Context.MODE_PRIVATE)
                 .edit()
                 .clear()
                 .apply();
 
-        // 2. Resetta variabile locale
         userToken = null;
 
-        // 3. Vai alla Login
         Intent intent = new Intent(HomeActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

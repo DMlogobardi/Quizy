@@ -57,10 +57,7 @@ public class EditQuizActivity extends AppCompatActivity {
         setupSpinner();
         setupRecyclerView();
 
-        // 2. Popoliamo SUBITO i campi base passati dall'Intent (per non aspettare il server)
         popolaDatiBaseDallIntent();
-
-        // 3. Carichiamo le domande dal server usando startQuiz
         caricaDomandeDalServer();
 
         // Listener per aggiungere una nuova domanda vuota
@@ -70,11 +67,8 @@ public class EditQuizActivity extends AppCompatActivity {
             domandeList.add(new domandaDTO("", 0, 0, r));
             domandeAdapter.notifyItemInserted(domandeList.size() - 1);
         });
-
-        // Listener per il salvataggio finale
         buttonSalvaModifiche.setOnClickListener(v -> salvaModificheQuiz());
     }
-
     private void bindViews() {
         editTextTitolo = findViewById(R.id.edit_text_titolo);
         editTextDescrizione = findViewById(R.id.edit_text_descrizione);
@@ -85,7 +79,6 @@ public class EditQuizActivity extends AppCompatActivity {
         buttonSalvaModifiche = findViewById(R.id.button_salva_modifiche);
         buttonAggiungiDomanda = findViewById(R.id.button_aggiungi_domanda_modifica);
     }
-
     private void popolaDatiBaseDallIntent() {
         // Questi dati arrivano dal QuizAdapter (ListQuizDTO li ha)
         editTextTitolo.setText(getIntent().getStringExtra("TITOLO"));
@@ -99,7 +92,6 @@ public class EditQuizActivity extends AppCompatActivity {
             spinnerDifficolta.setSelection(pos);
         }
     }
-
     private void caricaDomandeDalServer() {
         // Usiamo startQuiz perché getQuizListCreator non ci dà le domande
         RetrofitInstance.getService().startQuiz(token, new StartQuizNoPassRequest(quizId))
@@ -114,7 +106,6 @@ public class EditQuizActivity extends AppCompatActivity {
                             Toast.makeText(EditQuizActivity.this, "Impossibile recuperare le domande", Toast.LENGTH_SHORT).show();
                         }
                     }
-
                     @Override
                     public void onFailure(Call<List<domandaDTO>> call, Throwable t) {
                         Toast.makeText(EditQuizActivity.this, "Errore di rete: " + t.getMessage(), Toast.LENGTH_SHORT).show();
@@ -123,7 +114,7 @@ public class EditQuizActivity extends AppCompatActivity {
     }
 
     private void salvaModificheQuiz() {
-        // Raccogliamo i dati aggiornati dall'interfaccia
+        // Raccolgo i dati aggiornati dall'interfaccia
         String titolo = editTextTitolo.getText().toString().trim();
         String descrizione = editTextDescrizione.getText().toString().trim();
         String tempo = editTextTempo.getText().toString().trim();
@@ -134,8 +125,6 @@ public class EditQuizActivity extends AppCompatActivity {
             Toast.makeText(this, "Compila i campi obbligatori", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Creiamo il DTO di Update (che è uguale a quello di Create, ma con l'ID)
         UpdateQuizRequest request = new UpdateQuizRequest(
                 quizId,
                 titolo,
@@ -157,21 +146,18 @@ public class EditQuizActivity extends AppCompatActivity {
                     Toast.makeText(EditQuizActivity.this, "Errore salvataggio: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 Toast.makeText(EditQuizActivity.this, "Errore di connessione", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
     private void setupSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.difficolta_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerDifficolta.setAdapter(adapter);
     }
-
     private void setupRecyclerView() {
         domandeAdapter = new DomandeAdapter(domandeList);
         recyclerViewDomande.setLayoutManager(new LinearLayoutManager(this));

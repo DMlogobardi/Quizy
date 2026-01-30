@@ -89,13 +89,6 @@ public class CreazioneActivity extends AppCompatActivity {
         }
 
         QuizDTO quiz = new QuizDTO(titolo, descrizione, difficolta, tempo, numeroDomande, password, domandeList);
-
-        /*
-        Gson gson = new Gson();
-        String json = gson.toJson(quiz);
-        Log.d("CreazioneActivity", "Quiz JSON: " + json);
-        */
-
         sendQuizToServer(quiz);
     }
 
@@ -109,14 +102,12 @@ public class CreazioneActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     Toast.makeText(CreazioneActivity.this, "Quiz creato con successo!", Toast.LENGTH_SHORT).show();
 
-
-
                     Intent intent = new Intent(ctx, HomeActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.putExtra("token", token);
                     startActivity(intent);
 
-                    finish(); // Close the activity
+                    finish();
 
                 } else {
                     System.out.println(token);
