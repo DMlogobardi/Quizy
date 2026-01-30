@@ -56,6 +56,7 @@ public class AutanticateMenager {
 
     public void registra(Utente u) throws RegisterFailed {
         try{
+
             String hash = crypt.hashPassword(u.getPasswordHash());
             u.setPasswordHash(hash);
             u.setIsCompilatore(true);

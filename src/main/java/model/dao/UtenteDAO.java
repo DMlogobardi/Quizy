@@ -20,7 +20,7 @@ public class UtenteDAO {
     public UtenteDAO() {
     }
 
-    public List<Utente> findAllPaginated(int pageNumber, int pageSize) throws UserNotFoundException, AppException {
+    public List<Utente> findAllPaginated(int pageNumber, int pageSize) throws AppException {
         if (pageNumber <= 0 || pageSize <= 0) {
             throw new AppException("Pagina invalida");
         }
@@ -85,12 +85,18 @@ public class UtenteDAO {
     }
 
     public void update(Utente u) throws EmptyFild, AppException {
-        if(u == null) {
+        if(u == null || u.getId() == null || u.getId() <= 0) {
             throw new EmptyFild("dati utente vuoti");
         }
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
+
+            Utente esistente = em.find(Utente.class, u.getId());
+            if (esistente == null) {
+                throw new EntityNotFoundException("Impossibile aggiornare: Utente non trovato");
+            }
+
             em.merge(u);
             tx.commit();
         }catch (Exception e) {
@@ -101,8 +107,8 @@ public class UtenteDAO {
     }
 
     public void delete(Utente u) throws EmptyFild, UserNotFoundException {
-        if(u == null) {
-            throw new EmptyFild("utente e null");
+        if(u == null || u.getId() == null || u.getId() <= 0) {
+            throw new EmptyFild("dati utente vuoti");
         }
 
         EntityTransaction tx = em.getTransaction();

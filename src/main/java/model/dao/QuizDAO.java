@@ -44,11 +44,14 @@ public class QuizDAO {
     }
 
     public List<Quiz> findAllByUtente(int pageNumber, Utente utente) throws EntityNotFoundException, EmptyFild {
-        if (utente == null) {
+        if (utente == null || utente.getId() == null || utente.getId() <= 0) {
             throw new EmptyFild("Utente invalido");
         }
-        int pageSize = 10;
+        if (pageNumber <= 0) {
+            throw new AppException("Pagina invalida");
+        }
 
+        int pageSize = 10;
         return em.createNamedQuery("Quiz.findAllByUtente", Quiz.class)
                 .setParameter("utente", utente)
                 .setFirstResult((pageNumber - 1) * pageSize)
@@ -74,7 +77,10 @@ public class QuizDAO {
     }
 
     public void update(Quiz quiz, Quiz q, Utente u) throws EntityNotFoundException, EmptyFild {
-        if (u == null || u.getId() == null) throw new EmptyFild("utente non valido");
+        if (u == null || u.getId() == null || u.getId() <= 0) throw new EmptyFild("utente non valido");
+        if (quiz == null) {
+            throw new EmptyFild("Quiz invalido");
+        }
 
         EntityTransaction tx = em.getTransaction();
         try {
