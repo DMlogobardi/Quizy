@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.quizzy.Activity.EditQuizActivity;
 import com.example.quizzy.Activity.QuizGameActivity;
 import com.example.quizzy.DTO.ListQuizDTO;
 import com.example.quizzy.R;
@@ -23,11 +24,14 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     private String token;
     private QuizActionListener listener;
 
+    private boolean isCreatorMode;
 
-    public QuizAdapter(List<ListQuizDTO> quizList, String token, QuizActionListener listener) {
+
+    public QuizAdapter(List<ListQuizDTO> quizList, String token, QuizActionListener listener, boolean isCreatorMode) {
         this.quizList = quizList;
         this.token = token;
         this.listener = listener;
+        this.isCreatorMode = isCreatorMode;
 
     }
 
@@ -44,16 +48,33 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
         holder.nomeQuiz.setText(quiz.getTitolo());
 
         // gestione del click
-        holder.itemView.setOnClickListener(v -> {
-            Context context = v.getContext();
-            Intent intent = new Intent(context, QuizGameActivity.class);
-            intent.putExtra("QUIZ_ID", quiz.getId()); // Passiamo l'ID del quiz selezionato
-            intent.putExtra("token", token);          // Passiamo il token utente
-            // Avviamo l'activity
-            context.startActivity(intent);
-        });
 
-        // cestino
+        if (isCreatorMode) {
+            holder.itemView.setOnClickListener(v -> {
+                Context context = v.getContext();
+                Intent intent = new Intent(context, EditQuizActivity.class);
+                intent.putExtra("QUIZ_ID", quiz.getId());
+                intent.putExtra("token", token);
+                // Passiamo i dati che ListQuizDTO possiede già
+                intent.putExtra("TITOLO", quiz.getTitolo());
+                intent.putExtra("DESCRIZIONE", quiz.getDescrizione());
+                intent.putExtra("DIFFICOLTA", quiz.getDifficolta());
+                intent.putExtra("TEMPO", quiz.getTempo());
+                context.startActivity(intent);
+            });
+
+        } else {
+            holder.itemView.setOnClickListener(v -> {
+                Context context = v.getContext();
+                Intent intent = new Intent(context, QuizGameActivity.class);
+                intent.putExtra("QUIZ_ID", quiz.getId()); // Passiamo l'ID del quiz selezionato
+                intent.putExtra("token", token);          // Passiamo il token utente
+                // Avviamo l'activity
+                context.startActivity(intent);
+            });
+        }
+        
+        // Il cestino per l'eliminazione è sempre visibile in entrambe le modalità
         holder.btnDelete.setOnClickListener(v -> {
             if (listener != null) {
                 // Passiamo l'ID del quiz e la posizione nella lista
@@ -98,7 +119,7 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
         public QuizViewHolder(@NonNull View itemView) {
             super(itemView);
             nomeQuiz = itemView.findViewById(R.id.nome_quiz_row);
-            btnDelete = itemView.findViewById(R.id.btn_delete); // <--- NUOVO
+            btnDelete = itemView.findViewById(R.id.btn_delete);
         }
     }
 }

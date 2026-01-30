@@ -83,7 +83,7 @@ public class HomeActivity extends AppCompatActivity {
                     Toast.makeText(HomeActivity.this, "Devi essere un Creatore per eliminare i quiz!", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        }, isCreatorMode);
 
         listaQuiz.setAdapter(quizAdapter);
     }
@@ -122,7 +122,6 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    // Seleziona il quiz per modificare
     private void setupClickListeners() {
         menuIcon.setOnClickListener(v -> toggleMenu());
 

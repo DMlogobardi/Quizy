@@ -47,6 +47,11 @@
             android:label="false"
             >
         </activity>
+        <activity
+            android:name=".Activity.EditQuizActivity"
+            android:label="false"
+            >
+        </activity>
 
 
     </application>
