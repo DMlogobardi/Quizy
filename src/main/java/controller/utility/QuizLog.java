@@ -5,6 +5,7 @@ import jakarta.inject.Singleton;
 import model.entity.Quiz;
 import model.entity.Utente;
 import model.exception.AppException;
+import model.exception.EmptyFild;
 import model.mapper.EntityRefresher;
 
 import java.util.ArrayList;
@@ -77,5 +78,31 @@ public class QuizLog {
                 .limit(pageSize)
                 .map(quiz -> refresher.reattach(quiz)) // <--- QUI
                 .toList();
+    }
+
+    public void rimuoviSingoloQuiz(Utente utente, Integer quizId) throws AppException {
+        if(quizId == null || quizId <= 0) throw new EmptyFild("id non valido");
+        if(utente == null || utente.getId() == null || utente.getId() <= 0) throw new EmptyFild("utente non valido");
+
+        Map<Integer, Quiz> userQuizzes = logQuizBible.get(utente);
+
+        if (userQuizzes == null || userQuizzes.remove(quizId) == null) {
+            throw new AppException("Impossibile eliminare: Quiz con ID " + quizId + " non trovato per l'utente.");
+        }
+    }
+
+    public void aggiornaSingoloQuiz(Utente utente, Quiz nuovoQuiz) throws AppException {
+        if (nuovoQuiz == null || nuovoQuiz.getId() == null || nuovoQuiz.getId() <= 0) {
+            throw new AppException("Quiz non valido per l'aggiornamento");
+        }
+        if (utente == null || utente.getId() == null || utente.getId() <= 0) {
+            throw new AppException("Utente non valido");
+        }
+
+        Map<Integer, Quiz> userQuizzes = logQuizBible.get(utente);
+
+        if (userQuizzes == null || userQuizzes.replace(nuovoQuiz.getId(), nuovoQuiz) == null) {
+            throw new AppException("Impossibile aggiornare: Quiz con ID " + nuovoQuiz.getId() + " non trovato per l'utente.");
+        }
     }
 }

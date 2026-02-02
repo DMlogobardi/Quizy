@@ -156,6 +156,9 @@ public class QuizUserMenager {
 
             if( q == null) {
                 q = dao.findById(quiz.getId());
+                if(q == null) {
+                    throw new QuizUseException("Quiz not exist");
+                }
             }
 
             if(!crypt.verificaPassword(password, q.getPasswordQuiz())) {
@@ -181,6 +184,9 @@ public class QuizUserMenager {
 
             if( q == null) {
                 q = dao.findById(quiz.getId());
+                if(q == null) {
+                    throw new QuizUseException("Quiz not exist");
+                }
             }
 
             if (q.getPasswordQuiz() != null && !q.getPasswordQuiz().isBlank()) {
