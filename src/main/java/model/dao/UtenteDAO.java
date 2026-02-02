@@ -99,7 +99,12 @@ public class UtenteDAO {
 
             em.merge(u);
             tx.commit();
-        }catch (Exception e) {
+        } catch (EntityNotFoundException e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+
+            throw e;
+        } catch (Exception e) {
             if (tx.isActive()) tx.rollback();
             e.printStackTrace();
             throw new AppException("Errore durante l'update");

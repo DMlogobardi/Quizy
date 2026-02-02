@@ -257,7 +257,7 @@ public class UtenteDAOTest {
             verify(tx).begin();
             verify(em).merge(u);
             verify(tx).commit();
-            verify(tx, never()).rollback(); // Non deve esserci rollback
+            verify(tx, never()).rollback();
         }
 
         @Test
@@ -290,10 +290,10 @@ public class UtenteDAOTest {
 
             when(em.find(Utente.class, 999)).thenReturn(null);
 
-            assertThrows(AppException.class, () -> dao.update(u));
+            assertThrows(EntityNotFoundException.class, () -> dao.update(u));
 
-            verify(tx).rollback(); // Verifichiamo che la transazione venga annullata
-            verify(em, never()).merge(any()); // Il merge non deve essere chiamato se non esiste!
+            verify(tx).rollback();
+            verify(em, never()).merge(any());
         }
 
         //test delete
