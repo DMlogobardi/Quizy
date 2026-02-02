@@ -62,6 +62,11 @@ public class AutanticateMenager {
             u.setIsCompilatore(true);
             u.setIsCreatore(false);
             u.setIsManager(false);
+
+            Utente trovato = dao.findForLogin(u.getUsername());
+            if(trovato != null)
+                throw new RegisterFailed("invalid username");
+
             dao.register(u);
 
         } catch (AppException e) {
