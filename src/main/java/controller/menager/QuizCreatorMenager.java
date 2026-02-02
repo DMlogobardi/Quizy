@@ -103,9 +103,9 @@ public class QuizCreatorMenager {
             tokenCheck(token);
 
             Utente u = logBeble.getUtente(token);
-            Quiz deleteQuiz = quizLog.getQuiz(u, quiz.getId());
+            quizLog.rimuoviSingoloQuiz(u, quiz.getId());
 
-            dao.delete(quiz.getId(), deleteQuiz, u);
+            dao.delete(quiz.getId(), u);
 
         } catch (TokenExpiredException e) {
             throw new QuizServiceException("token expired, logout forzato");
@@ -125,6 +125,7 @@ public class QuizCreatorMenager {
             Quiz oldQuiz = quizLog.getQuiz(u, quiz.getId());
 
             dao.update(quiz, oldQuiz, u);
+            quizLog.aggiornaSingoloQuiz(u, quiz);
 
         } catch (TokenExpiredException e) {
             throw new QuizServiceException("token expired, logout forzato");

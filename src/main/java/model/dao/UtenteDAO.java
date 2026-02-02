@@ -116,7 +116,7 @@ public class UtenteDAO {
             tx.begin();
             em.remove(em.merge(u));
             tx.commit();
-        } catch (EntityNotFoundException e) {
+        } catch (Exception e) {
             if (tx.isActive()) tx.rollback();
             e.printStackTrace();
             throw new UserNotFoundException("utente non trovato");

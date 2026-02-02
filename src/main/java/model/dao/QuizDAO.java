@@ -129,21 +129,28 @@ public class QuizDAO {
         }
     }
 
-    public void delete(Integer quizId, Quiz q, Utente u) throws EntityNotFoundException, EmptyFild {
-        if (u == null || u.getId() == null) throw new EmptyFild("utente non valido");
+    public void delete(Integer quizId, Utente u) throws EntityNotFoundException, EmptyFild {
+        if (u == null || u.getId() == null || u.getId() <= 0) throw new EmptyFild("utente non valido");
+        if (quizId == null || quizId <= 0) throw new EmptyFild("id quiz non valido");
 
-        if (q == null ) {
-            q = (Quiz) em.createQuery(
-                            "SELECT q FROM Quiz q WHERE q.id = :id AND q.utente.id = :userId", Quiz.class)
-                    .setParameter("id", quizId)
-                    .setParameter("userId", u.getId())
-                    .getResultStream()
-                    .findFirst()
-                    .orElseThrow(() -> new EntityNotFoundException("quiz non trovato o non appartiene all'utente"));
+        Quiz q = em.createQuery(
+                        "SELECT q FROM Quiz q WHERE q.id = :id AND q.utente.id = :userId", Quiz.class)
+                .setParameter("id", quizId)
+                .setParameter("userId", u.getId())
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("quiz non trovato o non appartiene all'utente"));
+
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.remove(em.merge(q));
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
         }
-
-        em.getTransaction().begin();
-        em.remove(q);
-        em.getTransaction().commit();
     }
 }
