@@ -36,6 +36,9 @@ public class TicketDAO {
     }
 
     public Ticket findById(int id) throws EntityNotFoundException {
+        if (id <= 0)
+            throw new EntityNotFoundException("id non valido");
+
         return em.find(Ticket.class, id);
     }
 
@@ -44,7 +47,7 @@ public class TicketDAO {
             throw new AppException("Pagina invalida");
         }
 
-        if(utente==null){
+        if(utente==null || utente.getId() == null || utente.getId() <= 0){
             throw new EmptyFild("Utente non valido");
         }
 
@@ -59,7 +62,7 @@ public class TicketDAO {
     }
 
     public void delete(Ticket ticket) throws EntityNotFoundException, EmptyFild {
-        if(ticket == null) {
+        if(ticket == null || ticket.getId() == null || ticket.getId() <= 0) {
             throw new EmptyFild("dati ticket vuoto");
         }
 
@@ -76,7 +79,7 @@ public class TicketDAO {
     }
 
     public void update(Ticket ticket) throws EmptyFild, EntityNotFoundException {
-        if(ticket == null) {
+        if(ticket == null || ticket.getId() == null || ticket.getId() <= 0) {
             throw new EmptyFild("dati ticket vuoto");
         }
 

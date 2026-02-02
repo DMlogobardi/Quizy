@@ -616,7 +616,7 @@ public class QuizDAOTest {
             u.setUsername(username);
             u.setPasswordHash(pwd);
 
-            u.setIsCreatore(false);
+            u.setIsCreatore(true);
             u.setIsCompilatore(true);
             u.setIsManager(false);
             return u;

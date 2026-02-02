@@ -3,6 +3,7 @@ package model.dao;
 import jakarta.persistence.*;
 import model.entity.Domanda;
 import model.entity.Quiz;
+import model.entity.Risposta;
 import model.entity.Utente;
 import model.exception.AppException;
 import model.exception.EmptyFild;
@@ -14,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -409,6 +411,10 @@ public class DomandaDAOTest {
     @Tag("integration")
     class IntegrationTests {
         EntityManagerFactory emf;
+        Domanda testDomanda1, testDomanda2, testDomanda3;
+        Risposta testRisposta1;
+        Quiz quizTest, quizTest2;
+        Utente testUser;
 
         @BeforeEach
         void setup() throws Exception {
@@ -418,8 +424,31 @@ public class DomandaDAOTest {
             dao = new DomandaDAO();
             injectEm(dao, em);
 
-            em.getTransaction().begin();
+            ;
 
+            em.getTransaction().begin();
+            em.createQuery("DELETE FROM Risposta").executeUpdate();
+            em.createQuery("DELETE FROM Domanda").executeUpdate();
+            em.createQuery("DELETE FROM Quiz").executeUpdate();
+            em.createQuery("DELETE FROM Utente").executeUpdate();
+
+            testUser = creaUtenteDiTest("Mario", "Rossi", "mariorossi", "hash123");
+            quizTest = creaQuizDiTest(testUser, "test", "test");
+            quizTest2 = creaQuizDiTest(testUser, "test1", "test2");
+
+
+            testDomanda1 = creaDomandaDiTest(quizTest, "come mi chiamo?");
+            testRisposta1 = creaRispostaDiTest(testDomanda1, "Davide", false);
+
+            testDomanda2 = creaDomandaDiTest(quizTest, "come ti chiami?");
+            testDomanda3 = creaDomandaDiTest(quizTest2, "come si chiama?");
+
+            em.persist(testUser);
+            em.persist(quizTest);
+            em.persist(quizTest2);
+            em.persist(testDomanda1);
+            em.persist(testDomanda2);
+            em.persist(testDomanda3);
 
             em.getTransaction().commit();
             em.clear();
@@ -429,6 +458,154 @@ public class DomandaDAOTest {
         void tearDown() {
             if (em.isOpen()) em.close();
             if (emf.isOpen()) emf.close();
+        }
+
+        @Test
+        @DisplayName("findById deve recuperare la Domanda tramite l'id")
+        void findById_Integration() throws Exception {
+            Integer id = testDomanda1.getId();
+
+            Domanda result = dao.findById(id);
+
+            assertNotNull(result);
+            assertEquals("come mi chiamo?", testDomanda1.getQuesito());
+        }
+
+
+
+        @Test
+        @DisplayName("findAll deve ritornare una lista paginata di Domande")
+        void findAll_Integration() throws Exception {
+            int pageNumber = 1, pageSize = 2;
+            List<Domanda> page1 = dao.findAll(pageNumber, pageSize);
+
+            assertNotNull(page1);
+            assertEquals(pageSize, page1.size());
+
+            List<Domanda> page2 = dao.findAll(pageNumber + 1, pageSize);
+
+            assertNotNull(page2);
+            assertEquals(1, page2.size());
+
+            assertNotEquals(page1.get(0).getId(), page2.get(0).getId());
+        }
+
+        @Test
+        @DisplayName("findAllByQuiz deve ritornare una lista di Domande")
+        void findAllByQuiz_Integration() throws Exception {
+            List<Domanda> result = dao.findAllByQuiz(quizTest);
+
+            assertNotNull(result);
+            assertEquals(2, result.size());
+            assertEquals(result.get(0).getQuiz().getId(), quizTest.getId());
+            assertEquals(result.get(1).getQuiz().getId(), quizTest.getId());
+        }
+
+        @Test
+        @DisplayName("delete deve rimuovere tutti le domande e le risposte correlate")
+        void delete_Integration() throws Exception {
+            Integer idDomanda = testDomanda1.getId();
+            Integer idRisposta = testRisposta1.getId();
+
+            dao.delete(testDomanda1);
+
+            em.clear();
+
+            assertAll("Verifica cancellazione completa",
+                    () -> assertNull(em.find(Domanda.class, idDomanda)),
+                    () -> assertNull(em.find(Risposta.class, idRisposta))
+            );
+        }
+
+        @Test
+        @DisplayName("insert deve persistere una NUOVA domanda con risposte")
+        void insert_Integration() throws Exception {
+            Domanda newDomanda = creaDomandaDiTest(quizTest2, "voglio i biscotti?");
+            Risposta newRisposta1 = creaRispostaDiTest(newDomanda, "si", false);
+            Risposta newRisposta2 = creaRispostaDiTest(newDomanda, "no", true);
+
+            dao.insert(newDomanda);
+
+            Domanda recuperata = em.find(Domanda.class, newDomanda.getId());
+            assertNotNull(recuperata);
+            assertEquals(2, recuperata.getRisposte().size());
+            assertNotNull(recuperata.getRisposte().get(0).getId());
+            assertNotNull(recuperata.getRisposte().get(1).getId());
+        }
+
+        @Test
+        @DisplayName("update deve aggiornare i dati della Domanda")
+        void update_Integration() throws Exception {
+            Domanda datiAggiornati = creaDomandaDiTest(quizTest, "come mi chiamavo?");
+            Risposta rispostatest = creaRispostaDiTest(datiAggiornati, "Lucia", false);
+            datiAggiornati.setId(testDomanda1.getId());
+
+            dao.update(datiAggiornati);
+
+            Domanda verificata = em.find(Domanda.class, testDomanda1.getId());
+
+            assertAll("Verifica Aggiornamento",
+                    () -> assertNotNull(verificata),
+                    () -> assertEquals("come mi chiamavo?", verificata.getQuesito()),
+                    () -> assertEquals(1, verificata.getRisposte().size())
+            );
+        }
+
+        // --- HELPER METHOD PER CREARE DOMANDE VALIDE ---
+        private Domanda creaDomandaDiTest(Quiz quiz, String quesito) {
+            Domanda d = new Domanda();
+            d.setQuesito(quesito);
+            d.setQuiz(quiz); // Legame Domanda -> Quiz
+            d.setPuntiRispostaCorretta(1);
+            d.setPuntiRispostaSbagliata(0);
+            d.setRisposte(new ArrayList<>());
+
+            if (quiz.getDomande() == null) quiz.setDomande(new ArrayList<>());
+            quiz.getDomande().add(d); // Legame Quiz -> Domanda (Bidirezionale)
+            return d;
+        }
+
+        private Risposta creaRispostaDiTest(Domanda domanda, String testo, boolean corretta) {
+            Risposta r = new Risposta();
+            r.setAffermazione(testo);
+            r.setFlagRispostaCorretta(corretta);
+            r.setDomanda(domanda); // Legame Risposta -> Domanda
+
+            if (domanda.getRisposte() == null) domanda.setRisposte(new ArrayList<>());
+            domanda.getRisposte().add(r); // Legame Domanda -> Risposta (Bidirezionale)
+            return r;
+        }
+
+        private Quiz creaQuizDiTest(Utente autore, String titolo, String descrizione) {
+            Quiz q = new Quiz();
+            q.setUtente(autore);
+            q.setTitolo(titolo);
+            q.setDescrizione(descrizione);
+
+            // Campi obbligatori (@NotNull) con valori di default coerenti
+            q.setTempo("60 minuti");
+            q.setDifficolta("Media");
+            q.setNumeroDomande(10);
+
+            // Password opzionale, la lasciamo null di default o stringa vuota
+            q.setPasswordQuiz(null);
+
+            // Inizializziamo la lista domande per evitare NullPointerException
+            q.setDomande(new ArrayList<>());
+
+            return q;
+        }
+        private Utente creaUtenteDiTest(String nome, String cognome, String username, String pwd) {
+            Utente u = new Utente();
+            u.setNome(nome);
+            u.setCognome(cognome);
+            u.setUsername(username);
+            u.setPasswordHash(pwd);
+
+            u.setIsCreatore(true);
+            u.setIsCompilatore(true);
+            u.setIsManager(false);
+            return u;
         }
     }
 
