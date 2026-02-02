@@ -8,10 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import model.dao.UtenteDAO;
 import model.entity.Utente;
-import model.exception.AppException;
-import model.exception.LoginFailed;
-import model.exception.RegisterFailed;
-import model.exception.TokenExpiredException;
+import model.exception.*;
 
 @ApplicationScoped
 public class AutanticateMenager {
@@ -56,14 +53,16 @@ public class AutanticateMenager {
 
     public void registra(Utente u) throws RegisterFailed {
         try{
+            Utente trovato = null;
 
             String hash = crypt.hashPassword(u.getPasswordHash());
             u.setPasswordHash(hash);
             u.setIsCompilatore(true);
             u.setIsCreatore(false);
             u.setIsManager(false);
-
-            Utente trovato = dao.findForLogin(u.getUsername());
+            try {
+                trovato = dao.findForLogin(u.getUsername());
+            } catch (UserNotFoundException e) {}
             if(trovato != null)
                 throw new RegisterFailed("invalid username");
 

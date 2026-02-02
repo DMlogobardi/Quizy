@@ -41,10 +41,8 @@ public class UtenteDAO {
             q.setParameter("username", username);
             return (Utente) q.getSingleResult();
         } catch (NoResultException e) {
-            // Se non c'è risultato, rilancio solo la mia eccezione
             throw new UserNotFoundException("Username non trovato");
         } catch (Exception e) {
-            // Se vuoi loggare, fallo ma rilancia solo la tua eccezione
             System.err.println("Errore generico durante login: " + e.getMessage());
             throw new UserNotFoundException("Username non trovato");
         }
