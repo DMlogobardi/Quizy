@@ -79,6 +79,8 @@ public class QuizDAOTest {
         @Test
         void findById_shouldThrowException_whenIdIsInvalid() {
             assertThrows(AppException.class, () -> quizDAO.findById(0));
+
+            verifyNoInteractions(em);
         }
 
         /**
