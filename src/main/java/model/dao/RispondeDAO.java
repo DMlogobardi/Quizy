@@ -138,7 +138,11 @@ public class RispondeDAO {
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            em.remove(em.merge(ris));
+            Risponde managedRis = em.find(Risponde.class, ris.getId());
+
+            if (managedRis != null) {
+                em.remove(managedRis);
+            }
             tx.commit();
         } catch (Exception e) {
             if (tx.isActive()) tx.rollback();
