@@ -1,6 +1,6 @@
-package view.api;
+package controller.api;
 
-import controller.menager.AutanticateMenager;
+import model.menager.AutanticateMenager;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;

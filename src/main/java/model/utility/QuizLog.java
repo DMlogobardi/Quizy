@@ -1,4 +1,4 @@
-package controller.utility;
+package model.utility;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;

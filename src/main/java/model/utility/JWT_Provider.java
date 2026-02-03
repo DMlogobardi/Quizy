@@ -1,4 +1,4 @@
-package controller.utility;
+package model.utility;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

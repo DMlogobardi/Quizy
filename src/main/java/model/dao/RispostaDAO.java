@@ -36,6 +36,10 @@ public class RispostaDAO {
     }
 
     public Risposta findById(int id) throws EntityNotFoundException {
+        if (id <= 0) {
+            throw new AppException("Id invalido");
+        }
+
         return em.find(Risposta.class, id);
     }
 
@@ -44,7 +48,7 @@ public class RispostaDAO {
             throw new AppException("Pagina invalida");
         }
 
-        if (domanda == null) {
+        if (domanda == null || domanda.getId() == null || domanda.getId() <= 0) {
             throw new EmptyFild("Domanda non valido");
         }
 
@@ -56,9 +60,9 @@ public class RispostaDAO {
                 .getResultList();
     }
 
-    public void insert(Risposta r) throws EntityNotFoundException, EmptyFild {
-        if(r == null) {
-            throw new EmptyFild("Risposta is empty");
+    public void insert(Risposta r) throws EmptyFild {
+        if(r == null || r.getDomanda() == null || r.getDomanda().getId() == null || r.getDomanda().getId() <= 0) {
+            throw new EmptyFild("Risposta is invalid");
         }
 
         EntityTransaction tx = em.getTransaction();
@@ -69,12 +73,12 @@ public class RispostaDAO {
         }catch (Exception e) {
             if (tx.isActive()) tx.rollback();
             e.printStackTrace();
-            throw new RegisterFailed("Errore durante la registrazione");
+            throw new AppException("Errore durante la registrazione");
         }
     }
 
     public void update(Risposta r) throws EntityNotFoundException, EmptyFild {
-        if(r == null) {
+        if(r == null || r.getId() == null || r.getId() <= 0) {
             throw new EmptyFild("Risposta is empty");
         }
         EntityTransaction tx = em.getTransaction();
@@ -89,8 +93,8 @@ public class RispostaDAO {
         }
     }
 
-    public void delete(Risposta r) throws EntityNotFoundException, EmptyFild {
-        if(r == null) {
+    public void delete(Risposta r) throws EmptyFild {
+        if(r == null || r.getId() == null || r.getId() <= 0) {
             throw new EmptyFild("Risposta is empty");
         }
 
@@ -99,7 +103,7 @@ public class RispostaDAO {
             tx.begin();
             em.remove(em.merge(r));
             tx.commit();
-        } catch (EntityNotFoundException e) {
+        } catch (Exception e) {
             if (tx.isActive()) tx.rollback();
             e.printStackTrace();
             throw new UserNotFoundException("utente non trovato");

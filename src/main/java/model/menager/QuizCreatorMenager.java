@@ -1,6 +1,5 @@
-package controller.menager;
+package model.menager;
 
-import controller.utility.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,6 +9,10 @@ import model.entity.Quiz;
 import model.entity.Risposta;
 import model.entity.Utente;
 import model.exception.*;
+import model.utility.AccessControlService;
+import model.utility.PassCrypt;
+import model.utility.QuizLog;
+import model.utility.SessionLog;
 
 import java.util.List;
 

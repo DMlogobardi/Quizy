@@ -1,6 +1,5 @@
-package controller.menager;
+package model.menager;
 
-import controller.utility.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,6 +10,10 @@ import model.dao.QuizDAO;
 import model.dao.RispondeDAO;
 import model.entity.*;
 import model.exception.*;
+import model.utility.AccessControlService;
+import model.utility.PassCrypt;
+import model.utility.QuizLog;
+import model.utility.SessionLog;
 import org.hibernate.Hibernate;
 
 import java.time.LocalDateTime;

@@ -1,6 +1,6 @@
-package view.api;
+package controller.api;
 
-import controller.menager.QuizCreatorMenager;
+import model.menager.QuizCreatorMenager;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.enterprise.context.RequestScoped;

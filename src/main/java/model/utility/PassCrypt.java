@@ -1,4 +1,4 @@
-package controller.utility;
+package model.utility;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import model.exception.EmptyFild;

@@ -32,6 +32,12 @@ public class FaDAO {
     }
 
     public Fa findByUtenteQuiz(Quiz quiz, Utente u) throws EntityNotFoundException {
+        if(quiz == null || quiz.getId() == null || quiz.getId() <= 0)
+            throw new  AppException("quiz non valido");
+
+        if(u == null || u.getId() == null || u.getId() <= 0)
+            throw new  AppException("utente non valido");
+
         return em.createNamedQuery("Fa.findByUserAndQuiz", Fa.class)
                 .setParameter("utente", u)
                 .setParameter("quiz", quiz)
@@ -65,7 +71,10 @@ public class FaDAO {
     }
 
     public void insert(Fa f) throws EmptyFild {
-        if (f == null) {
+        if (f == null || f.getUtente()== null || f.getUtente().getId()==null || f.getUtente().getId()<= 0) {
+            throw new EmptyFild("Fa invalida");
+        }
+        if (f.getQuiz() == null || f.getQuiz().getId() == null || f.getQuiz().getId() <= 0) {
             throw new EmptyFild("Fa invalida");
         }
         EntityTransaction tx = em.getTransaction();
@@ -81,7 +90,7 @@ public class FaDAO {
     }
 
     public void update(Fa f) throws EmptyFild {
-        if (f == null) {
+        if (f == null || f.getId() == null || f.getId() <= 0) {
             throw new EmptyFild("Fa invalida");
         }
         EntityTransaction tx = em.getTransaction();
@@ -97,7 +106,7 @@ public class FaDAO {
     }
 
     public void delete(Fa f) throws EmptyFild {
-        if (f == null) {
+        if (f == null || f.getId() == null || f.getId() <= 0) {
             throw new EmptyFild("Fa invalida");
         }
         EntityTransaction tx = em.getTransaction();

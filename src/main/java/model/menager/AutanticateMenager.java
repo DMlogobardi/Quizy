@@ -1,9 +1,8 @@
-package controller.menager;
+package model.menager;
 
-import controller.utility.AccessControlService;
-import controller.utility.JWT_Provider;
-import controller.utility.PassCrypt;
-import controller.utility.SessionLog;
+import model.utility.AccessControlService;
+import model.utility.PassCrypt;
+import model.utility.SessionLog;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import model.dao.UtenteDAO;
