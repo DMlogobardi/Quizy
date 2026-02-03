@@ -410,10 +410,14 @@ public class RispostaDAOTest {
             injectEm(dao, em);
 
             em.getTransaction().begin();
+            em.createQuery("DELETE FROM Risposta").executeUpdate();
+            em.createQuery("DELETE FROM Domanda").executeUpdate();
+            em.createQuery("DELETE FROM Quiz").executeUpdate();
+            em.createQuery("DELETE FROM Utente").executeUpdate();
 
             risp1 = creaRispostaCompleta("pippo", "matt1", "1+1=?", "2", true);
-            risp1 = creaRispostaCompleta("pippo", "matt1", "1+1=?", "3", false);
-            risp1 = creaRispostaCompleta("pippo", "matt2", "2x+5=?", "15", true);
+            risp2 = creaRispostaCompleta("pippo", "matt1", "1+1=?", "3", false);
+            risp3 = creaRispostaCompleta("pippo", "matt2", "2x+5=?", "15", true);
 
             em.getTransaction().commit();
             em.clear();
@@ -423,6 +427,105 @@ public class RispostaDAOTest {
         void tearDown() {
             if (em.isOpen()) em.close();
             if (emf.isOpen()) emf.close();
+        }
+
+        @Test
+        @DisplayName("findAll deve ritornare una lista paginata di Risposte")
+        void findAll_Integration() throws Exception {
+            int pageNumber = 1, pageSize = 2;
+            List<Risposta> page1 = dao.findAll(pageNumber, pageSize);
+
+            assertNotNull(page1);
+            assertEquals(pageSize, page1.size());
+
+            List<Risposta> page2 = dao.findAll(pageNumber + 1, pageSize);
+
+            assertNotNull(page2);
+            assertEquals(1, page2.size());
+
+            assertNotEquals(page1.get(0).getId(), page2.get(0).getId());
+        }
+
+        @Test
+        @DisplayName("findById deve recuperare la Risposta tramite l'id")
+        void findById_Integration() throws Exception {
+            Integer id = risp1.getId();
+
+            Risposta result = dao.findById(id);
+
+            assertNotNull(result);
+            assertEquals("2", risp1.getAffermazione());
+        }
+
+        @Test
+        @DisplayName("findByDomanda deve restituire le risposte della domanda specifica")
+        void findByDomanda_Integration() throws Exception {
+            Domanda domandaTarget = risp1.getDomanda();
+
+            em.getTransaction().begin();
+            Risposta rispExtra = new Risposta();
+            rispExtra.setAffermazione("3");
+            rispExtra.setFlagRispostaCorretta(false);
+            rispExtra.setDomanda(domandaTarget);
+            em.persist(rispExtra);
+            em.getTransaction().commit();
+            em.clear();
+
+            int pageNumber = 1;
+            int pageSize = 10;
+            List<Risposta> result = dao.findByDomanda(domandaTarget, pageNumber, pageSize);
+
+            assertNotNull(result);
+            assertEquals(2, result.size(), "Dovrebbe trovare 2 risposte per questa specifica domanda");
+        }
+
+        @Test
+        @DisplayName("insert deve salvare correttamente una nuova risposta su una domanda esistente")
+        void insert_Integration() throws Exception {
+            Domanda domandaEsistente = risp1.getDomanda();
+
+            Risposta nuovaRisp = new Risposta();
+            nuovaRisp.setAffermazione("Risposta Extra");
+            nuovaRisp.setFlagRispostaCorretta(false);
+            nuovaRisp.setDomanda(domandaEsistente);
+
+            dao.insert(nuovaRisp);
+            em.clear();
+
+            assertNotNull(nuovaRisp.getId(), "L'ID dovrebbe essere stato generato");
+            Risposta salvata = em.find(Risposta.class, nuovaRisp.getId());
+            assertNotNull(salvata);
+            assertEquals("Risposta Extra", salvata.getAffermazione());
+            assertEquals(domandaEsistente.getId(), salvata.getDomanda().getId());
+        }
+
+        @Test
+        @DisplayName("update deve modificare correttamente i dati sul database")
+        void update_Integration() throws Exception {
+            Risposta r = risp1;
+            r.setAffermazione("Nuova Risposta");
+            r.setFlagRispostaCorretta(false);
+
+            dao.update(r);
+            em.clear();
+
+            Risposta updated = em.find(Risposta.class, r.getId());
+            assertNotNull(updated);
+            assertEquals("Nuova Risposta", updated.getAffermazione());
+            assertFalse(updated.getFlagRispostaCorretta());
+        }
+
+        @Test
+        @DisplayName("delete deve rimuovere la Risposta lasciando intatta la Domanda padre")
+        void delete_Integration() throws Exception {
+            Integer idRisposta = risp1.getId();
+            Integer idDomandaPadre = risp1.getDomanda().getId();
+
+            dao.delete(risp1);
+            em.clear();
+
+            assertNull(em.find(Risposta.class, idRisposta));
+            assertNotNull(em.find(Domanda.class, idDomandaPadre));
         }
 
         private Risposta creaRispostaCompleta(String username, String titoloQuiz, String quesitoDomanda, String testoRisposta, boolean isCorretta) {
