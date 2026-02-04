@@ -21,6 +21,10 @@ public class EntityRefresherTest {
     @InjectMocks
     private EntityRefresher entityRefresher;
 
+    // =========================
+    // ===== UNIT TESTS ========
+    // =========================
+
     //test del metodo reattach
     @Test
     void reattach_ShouldReturnNull_WhenEntityIsNull() {

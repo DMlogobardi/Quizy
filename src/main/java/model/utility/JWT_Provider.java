@@ -11,7 +11,6 @@ import model.exception.TokenExpiredException;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
-//token di accesso
 @ApplicationScoped
 public class JWT_Provider {
 
@@ -23,12 +22,19 @@ public class JWT_Provider {
     }
 
     public String generateToken(Utente utente, String roole) {
+        if (utente == null || utente.getId() == null || utente.getId() <= 0) {
+            throw new IllegalArgumentException("Impossibile generare token: Utente o ID non validi");
+        }
+        if (!"creatore".equals(roole) && !"compilatore".equals(roole) && !"manager".equals(roole)) {
+            throw new IllegalArgumentException("Impossibile generare token: Ruolo non valido");
+        }
+
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
 
         return Jwts.builder()
-                .subject(roole)   // Username (Standard Claim)
-                .claim("id", utente.getId())     // ID Utente (Custom Claim)
+                .subject(roole)
+                .claim("id", utente.getId())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(SECRET_KEY)
@@ -36,6 +42,10 @@ public class JWT_Provider {
     }
 
     public void validateToken(String token) throws TokenExpiredException, InvalidToken {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("token is empty or null");
+        }
+
         try {
             Jwts.parser()
                     .verifyWith(SECRET_KEY)
@@ -51,6 +61,10 @@ public class JWT_Provider {
     }
 
     public Integer getIdFromToken(String token) throws TokenExpiredException, AppException {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("token is empty or null");
+        }
+
         try {
             return Jwts.parser()
                     .verifyWith(SECRET_KEY)
@@ -67,6 +81,10 @@ public class JWT_Provider {
     }
 
     public String getRoleFromToken(String token) throws TokenExpiredException, AppException {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("token is empty or null");
+        }
+
         try {
             return Jwts.parser()
                     .verifyWith(SECRET_KEY)

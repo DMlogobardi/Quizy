@@ -15,7 +15,7 @@ public class AccessControlService {
     public AccessControlService() {
     }
 
-    public void checkCreatore(String token)throws InvalidRole {
+    public void checkCreatore(String token)throws InvalidRole, IllegalArgumentException {
         String role = jwtProvider.getRoleFromToken(token);
 
         if(!role.equals("creatore")) {
@@ -34,12 +34,12 @@ public class AccessControlService {
     public void checkManager(String token)throws InvalidRole {
         String role = jwtProvider.getRoleFromToken(token);
 
-        if(!role.equals("menager")) {
+        if(!role.equals("manager")) {
             throw new InvalidRole("Unauthorized");
         }
     }
 
-    public String newTokenByRole(String role, Utente u) {
+    public String newTokenByRole(String role, Utente u)throws IllegalArgumentException {
         return jwtProvider.generateToken(u, role);
     }
 }

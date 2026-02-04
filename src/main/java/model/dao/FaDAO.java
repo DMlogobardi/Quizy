@@ -59,7 +59,7 @@ public class FaDAO {
         if (pageNumber <= 0 || pageSize <= 0) {
             throw new AppException("Pagina invalida");
         }
-        if (utente == null) {
+        if (utente == null || utente.getId() == null || utente.getId() <= 0) {
             throw new EmptyFild("Utente invalido");
         }
 

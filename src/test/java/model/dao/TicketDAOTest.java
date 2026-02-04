@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import model.entity.Ticket;
 import model.entity.Utente;
 import model.exception.AppException;
+import model.exception.EmptyFild;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -99,8 +100,8 @@ public class TicketDAOTest {
 		 * 1. Input Validi (Utente != Null, pageNumber>0, pageSize>0)
 		 * 2. Input invalido (Utente == Null)
 		 * 3. Input invalido (utente.id <0)
-		 * 3. Input invalido (pageNumber<=0)
-		 * 4. Input invalido (pageSize<=0)
+		 * 4. Input invalido (pageNumber<=0)
+		 * 5. Input invalido (pageSize<=0)
 		 */
 		@Test
 		void findByUtente_shouldReturnList_whenInputsAreValid() throws AppException {
@@ -118,14 +119,35 @@ public class TicketDAOTest {
 			assertNotNull(result);
 		}
 
+		@Test
+
+		void findByUtente_shouldThrowException_whenInputsAreInvalid() {
+
+			Utente utenteNull = null;
+			Utente utenteValido = new Utente();
+			utenteValido.setId(1);
+			Utente utenteNonValido= new Utente();
+			utenteNonValido.setId(0);
+
+			assertThrows(AppException.class, () -> ticketDAO.findByUtente(utenteNull, 1, 10));
+			assertThrows(AppException.class, () -> ticketDAO.findByUtente(utenteNonValido, 1, 10));
+			assertThrows(AppException.class, () -> ticketDAO.findByUtente(utenteValido, 0, 10));
+			assertThrows(AppException.class, () -> ticketDAO.findByUtente(utenteValido, 1, 0));
+
+		}
+
 		/**
 		 * Category partition per insert:
 		 * 1. Input validi (ticket != null)
 		 * 2. Input invalidi (ticket = null)
+		 * 3. Input invalidi (ticket.id<=0)
 		 */
 		@Test
 		void insert_shouldPersist_whenTicketIsValid() throws Exception {
 			Ticket t = new Ticket();
+			Utente u = new Utente();
+			u.setId(1);
+			t.setUtente(u);
 			EntityTransaction tx = mock(EntityTransaction.class);
 			when(em.getTransaction()).thenReturn(tx);
 
@@ -133,6 +155,41 @@ public class TicketDAOTest {
 
 			verify(em).persist(t);
 			verify(tx).commit();
+		}
+
+		@Test
+		void insert_shouldThrowException_whenTicketIsNull() {
+			assertThrows(EmptyFild.class, () -> ticketDAO.insert(null));
+			verifyNoInteractions(em);
+		}
+
+		@Test
+		void insert_shouldThrowException_whenTicketUtenteIsNull() {
+			Ticket ticket = new Ticket();
+			ticket.setUtente(null);
+			assertThrows(AppException.class, () -> ticketDAO.insert(ticket));
+			verifyNoInteractions(em);
+		}
+
+		@Test
+		void insert_shouldThrowException_whenTicketUtenteIdIsNull() {
+			Ticket t = new Ticket();
+			Utente u = new Utente();
+			u.setId(null);
+			t.setUtente(u);
+			assertThrows(AppException.class, () -> ticketDAO.insert(t));
+			verifyNoInteractions(em);
+		}
+
+		@Test
+		void insert_shouldThrowException_whenTicketUtenteIdIsZeroOrNegative() {
+			Ticket t = new Ticket();
+			Utente u = new Utente();
+			u.setId(0);
+			t.setUtente(u);
+			assertThrows(AppException.class, () -> ticketDAO.insert(t));
+
+			verifyNoInteractions(em);
 		}
 
 		/**
@@ -154,6 +211,15 @@ public class TicketDAOTest {
 			verify(em).merge(t);
 		}
 
+		@Test
+		void update_shouldThrowException_whenTicketIsNull() {
+			Ticket ticket = new Ticket();
+			ticket.setId(0);
+			assertThrows(EmptyFild.class, () -> ticketDAO.update(null));
+			assertThrows(EmptyFild.class, () -> ticketDAO.update(ticket));
+		}
+
+
 		/**
 		 * Category partition per Delete:
 		 * 1. Input valido (Ticket != null e id>0)
@@ -172,6 +238,14 @@ public class TicketDAOTest {
 
 			verify(em).remove(t);
 		}
+		@Test
+		void delete_shouldThrowException_whenTicketIsNull() {
+			Ticket ticket = new Ticket();
+			ticket.setId(0);
+			assertThrows(EmptyFild.class, () -> ticketDAO.delete(null));
+			assertThrows(EmptyFild.class, () -> ticketDAO.delete(ticket));
+		}
+
 	}
 
 	// =========================

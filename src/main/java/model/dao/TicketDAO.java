@@ -96,7 +96,7 @@ public class TicketDAO {
     }
 
     public void insert(Ticket ticket) throws EmptyFild, EntityNotFoundException {
-        if(ticket == null) {
+        if(ticket == null || ticket.getUtente() == null || ticket.getUtente().getId() == null || ticket.getUtente().getId() <= 0) {
             throw new EmptyFild("dati ticket vuoto");
         }
 
