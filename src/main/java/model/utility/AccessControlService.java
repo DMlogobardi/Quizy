@@ -23,7 +23,7 @@ public class AccessControlService {
         }
     }
 
-    public void checkCompilatore(String token)throws InvalidRole {
+    public void checkCompilatore(String token)throws InvalidRole, IllegalArgumentException {
         String role = jwtProvider.getRoleFromToken(token);
 
         if(!role.equals("compilatore")) {
@@ -31,7 +31,7 @@ public class AccessControlService {
         }
     }
 
-    public void checkManager(String token)throws InvalidRole {
+    public void checkManager(String token)throws InvalidRole, IllegalArgumentException {
         String role = jwtProvider.getRoleFromToken(token);
 
         if(!role.equals("manager")) {
