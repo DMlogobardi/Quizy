@@ -470,12 +470,13 @@ public class QuizLogTest {
     @Tag("integration")
     class IntegrationTests {
         EntityManagerFactory emf;
+        EntityManager em;
         Utente test, test1;
 
         @BeforeEach
         void setup() throws Exception {
             emf = Persistence.createEntityManagerFactory("testPU");
-            EntityManager em = emf.createEntityManager();
+            em = emf.createEntityManager();
             log = new QuizLog();
             refresher = new EntityRefresher();
             injectEntityManager(refresher, em);
@@ -529,32 +530,55 @@ public class QuizLogTest {
 
         @Test
         void getQuiz_Integratio() throws Exception {
+            EntityManager em = emf.createEntityManager();
+            injectEntityManager(refresher, em);
+
             List<Quiz> result = log.getQuiz(test);
 
             assertNotNull(result);
             assertEquals("matematica", result.get(0).getTitolo());
             assertEquals("matematica1", result.get(1).getTitolo());
+
+            // Verifica che siano Managed
+            assertTrue(em.contains(result.get(0)), "Il quiz 1 deve essere managed");
+            assertTrue(em.contains(result.get(1)), "Il quiz 2 deve essere managed");
+
+            em.close();
         }
 
         @Test
         void getQuiz_Single_Integratio() throws Exception {
+            EntityManager em = emf.createEntityManager();
+            injectEntityManager(refresher, em);
+
             Quiz result = log.getQuiz(test, 1);
 
             assertNotNull(result);
             assertEquals("matematica", result.getTitolo());
+
+            // Verifica che sia Managed
+            assertTrue(em.contains(result), "Il quiz deve essere managed");
+
+            em.close();
         }
 
         @Test
         void getQuizPaginati_Integration_Success() throws AppException {
+
             List<Quiz> pagina1 = log.getQuizPaginati(test, 1, 1);
             List<Quiz> pagina2 = log.getQuizPaginati(test, 2, 1);
 
             assertEquals(1, pagina1.size());
             assertEquals(1, pagina1.get(0).getId());
+            assertTrue(em.contains(pagina1.get(0)), "Il quiz della pagina 1 deve essere managed");
 
             assertEquals(1, pagina2.size());
             assertEquals(2, pagina2.get(0).getId());
+            assertTrue(em.contains(pagina2.get(0)), "Il quiz della pagina 2 deve essere managed");
+
+            em.close();
         }
+
     }
 
     // =========================

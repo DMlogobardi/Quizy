@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import model.entity.Utente;
 import model.exception.AppException;
+import model.exception.EmptyFild;
 import model.exception.InvalidToken;
 import model.exception.TokenExpiredException;
 
@@ -22,7 +23,12 @@ public class SessionLog {
     }
 
     public void aggiungi(String token, Utente utente) throws TokenExpiredException, AppException, IllegalArgumentException {
-
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("token is empty or null");
+        }
+        if(utente == null || utente.getId() == null || utente.getId() <= 0) {
+            throw new EmptyFild("utente non valido");
+        }
         String existing = userIdToToken.putIfAbsent(utente.getId(), token);
         if (existing != null) {
             try {
@@ -30,6 +36,7 @@ public class SessionLog {
                 throw new AppException("Sessione già esistente per questo utente");
             } catch (TokenExpiredException e) {
                 userIdToToken.remove(utente.getId(), existing);
+                throw new TokenExpiredException("logOut Forzato");
             }
         }
 
@@ -37,12 +44,18 @@ public class SessionLog {
     }
 
     public Utente getUtente(String token) throws TokenExpiredException, IllegalArgumentException {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("token is empty or null");
+        }
         jwtProvider.validateToken(token);
 
         return logBible.get(token);
     }
 
     public void rimuovi(String token)  {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("token is empty or null");
+        }
         Utente u = getUtente(token);
         if (u != null) {userIdToToken.remove(u.getId(), token);}
         logBible.remove(token);
@@ -50,6 +63,9 @@ public class SessionLog {
     }
 
     public boolean isAlive(String token) throws TokenExpiredException, AppException, IllegalArgumentException {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("token is empty or null");
+        }
         try {
             jwtProvider.validateToken(token); // lancia eccezione se scaduto o invalido
             return logBible.containsKey(token);
@@ -64,8 +80,12 @@ public class SessionLog {
         }
     }
 
-    public void update(String token, Utente updatedUtente) throws TokenExpiredException, AppException, IllegalArgumentException {
-        // Controlla che il token sia valido
+    public void update(String token, Utente updatedUtente) throws TokenExpiredException, AppException, IllegalArgumentException, InvalidToken {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("token is empty or null");
+        }
+        if(updatedUtente == null) throw new EmptyFild("utente non valido");
+
         jwtProvider.validateToken(token);
 
         Utente precedente = logBible.replace(token, updatedUtente);
