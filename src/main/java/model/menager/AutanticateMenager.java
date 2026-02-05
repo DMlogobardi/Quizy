@@ -69,7 +69,10 @@ public class AutanticateMenager {
             dao.register(u);
 
         } catch (AppException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+            throw new RegisterFailed("Errore durante la registrazione");
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new RegisterFailed("Errore durante la registrazione");
         }
     }
@@ -91,6 +94,9 @@ public class AutanticateMenager {
         } catch (TokenExpiredException e) {
             throw e;
         } catch (AppException e) {
+            throw new AppException("password non cambiata");
+        }  catch (Exception e) {
+            e.printStackTrace();
             throw new AppException("password non cambiata");
         }
     }
