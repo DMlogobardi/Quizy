@@ -26,6 +26,12 @@ public class QuizLog {
     }
 
     public void aggiungi(Utente utente, Quiz quiz) throws AppException {
+        if(utente == null || utente.getId() == null || utente.getId() <= 0) {
+            throw new EmptyFild("utente non valido");
+        }
+        if(quiz == null || quiz.getId() == null || quiz.getId() <= 0) {
+            throw new EmptyFild("quiz non valido");
+        }
         Map<Integer, Quiz> userQuizzes = logQuizBible.computeIfAbsent(
                 utente,
                 u -> new ConcurrentHashMap<>()
@@ -37,6 +43,8 @@ public class QuizLog {
     }
 
     public List<Quiz> getQuiz(Utente utente) throws AppException {
+        if(utente == null) throw new EmptyFild("utente non valido");
+
         Map<Integer, Quiz> userQuizzes = logQuizBible.get(utente);
 
         if (userQuizzes == null || userQuizzes.isEmpty()) {
@@ -50,28 +58,35 @@ public class QuizLog {
     }
 
     public void clearQuiz(Utente utente) throws AppException {
+        if(utente == null) throw new EmptyFild("utente non valido");
+
         logQuizBible.remove(utente);
     }
 
     public Quiz getQuiz(Utente utente, int id) throws AppException {
+        if(utente == null) throw new EmptyFild("utente non valido");
+        if(id <= 0) throw new EmptyFild("id non valido");
+
         Map<Integer, Quiz> userQuizzes = logQuizBible.get(utente);
 
         Quiz quiz = userQuizzes != null ? userQuizzes.get(id) : null;
 
-        // MODIFICA: Restituisco l'oggetto riagganciato (o null)
         return refresher.reattach(quiz);
     }
 
     public List<Quiz> getQuizPaginati(Utente utente, int pageNumber, int pageSize) {
+        if(utente == null) throw new EmptyFild("utente non valido");
+        if (pageNumber <= 0 || pageSize <= 0) {
+            throw new AppException("Pagina invalida");
+        }
         Map<Integer, Quiz> userQuizzes = logQuizBible.get(utente);
         if (userQuizzes == null || userQuizzes.isEmpty()) {
             return new ArrayList<>();
         }
 
 
-        int offset = pageNumber * pageSize;
+        int offset = (pageNumber - 1) * pageSize;
 
-        // MODIFICA: Aggiunto .map(refresher::reattach) dopo il limit
         return userQuizzes.values().stream()
                 .sorted((q1, q2) -> Integer.compare(q1.getId(), q2.getId()))
                 .skip(offset)

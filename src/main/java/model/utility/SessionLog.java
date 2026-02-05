@@ -21,7 +21,7 @@ public class SessionLog {
     public SessionLog() {
     }
 
-    public void aggiungi(String token, Utente utente) throws TokenExpiredException, AppException {
+    public void aggiungi(String token, Utente utente) throws TokenExpiredException, AppException, IllegalArgumentException {
 
         String existing = userIdToToken.putIfAbsent(utente.getId(), token);
         if (existing != null) {
@@ -36,7 +36,7 @@ public class SessionLog {
         logBible.put(token, utente);
     }
 
-    public Utente getUtente(String token) throws TokenExpiredException {
+    public Utente getUtente(String token) throws TokenExpiredException, IllegalArgumentException {
         jwtProvider.validateToken(token);
 
         return logBible.get(token);
@@ -49,7 +49,7 @@ public class SessionLog {
 
     }
 
-    public boolean isAlive(String token) throws TokenExpiredException, AppException {
+    public boolean isAlive(String token) throws TokenExpiredException, AppException, IllegalArgumentException {
         try {
             jwtProvider.validateToken(token); // lancia eccezione se scaduto o invalido
             return logBible.containsKey(token);
@@ -64,7 +64,7 @@ public class SessionLog {
         }
     }
 
-    public void update(String token, Utente updatedUtente) throws TokenExpiredException, AppException {
+    public void update(String token, Utente updatedUtente) throws TokenExpiredException, AppException, IllegalArgumentException {
         // Controlla che il token sia valido
         jwtProvider.validateToken(token);
 
