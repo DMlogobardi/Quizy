@@ -97,6 +97,9 @@ public class QuizCreatorMenager {
         } catch (AppException e) {
             e.printStackTrace();
             throw new QuizServiceException("Error creating quiz");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new QuizServiceException("Error creating quiz");
         }
 
     }
@@ -115,6 +118,9 @@ public class QuizCreatorMenager {
         } catch (EntityNotFoundException e) {
             throw new QuizServiceException("Error creating quiz");
         } catch (AppException e) {
+            e.printStackTrace();
+            throw new QuizServiceException("Error creating quiz");
+        } catch (Exception e) {
             e.printStackTrace();
             throw new QuizServiceException("Error creating quiz");
         }
@@ -137,6 +143,9 @@ public class QuizCreatorMenager {
         } catch (AppException e) {
             e.printStackTrace();
             throw new QuizServiceException("Error updating quiz");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new QuizServiceException("Error creating quiz");
         }
     }
 
@@ -172,6 +181,9 @@ public class QuizCreatorMenager {
             throw new QuizServiceException("token expired, logout forzato");
         } catch (AppException e) {
             throw new QuizServiceException("Error getting quizzes");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new QuizServiceException("Error creating quiz");
         }
     }
 }

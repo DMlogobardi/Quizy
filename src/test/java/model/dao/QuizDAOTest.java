@@ -441,8 +441,8 @@ public class QuizDAOTest {
 
             // 2. Creazione Quiz con grafo completo
             quizTest1 = creaQuizDiTest(testUser, "matematica", "prima prova");
-            Domanda d1 = creaDomandaDiTest(quizTest1, "2+2?"); // L'helper deve settare d1.setQuiz(quizTest1)
-            creaRispostaDiTest(d1, "4", true); // L'helper deve settare r.setDomanda(d1)
+            Domanda d1 = creaDomandaDiTest(quizTest1, "2+2?");
+            creaRispostaDiTest(d1, "4", true);
 
             quizTest2 = creaQuizDiTest(testUser, "geometria", "prova geometria");
             quizTest3 = creaQuizDiTest(testUser2, "funzioni", "prova funzioni");
