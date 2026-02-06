@@ -317,7 +317,16 @@ public class AutanticateAPITest {
         }
 
         @AfterEach
-        public void cleanUp() {
+        public void cleanUp() throws NoSuchFieldException, IllegalAccessException {
+            Field bibleField = SessionLog.class.getDeclaredField("logBible");
+            Field userToTokenField = SessionLog.class.getDeclaredField("userIdToToken");
+
+            bibleField.setAccessible(true);
+            userToTokenField.setAccessible(true);
+
+            ((Map<?, ?>) bibleField.get(log)).clear();
+            ((Map<?, ?>) userToTokenField.get(log)).clear();
+
             if (em != null && em.isOpen()) em.close();
             if (emf != null && emf.isOpen()) emf.close();
         }
@@ -492,11 +501,14 @@ public class AutanticateAPITest {
         void cambiapassword_Integration_Failure_TokenNotAuthorized() {
             Map<String, String> body = Map.of("password", "newPass", "oldPassword", "sc2435");
 
-            String tokenValidoMaNonLoggato = jwtProvider.generateToken(alreadyLogTest, "compilatore");
+            Utente fake = new Utente();
+            fake.setId(999);
+            fake.setUsername("unknown");
+            String tokenInesistente = jwtProvider.generateToken(fake, "compilatore");
 
             Response response = target("/auth/newPassword")
                     .request()
-                    .header("Authorization", "Bearer " + tokenValidoMaNonLoggato)
+                    .header("Authorization", "Bearer " + tokenInesistente)
                     .post(Entity.json(body));
 
             assertEquals(400, response.getStatus());
