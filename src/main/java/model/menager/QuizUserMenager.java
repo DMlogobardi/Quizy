@@ -145,9 +145,12 @@ public class QuizUserMenager {
             return pagedQuizzes;
 
         } catch (TokenExpiredException e) {
-            throw new QuizServiceException("token expired, logout forzato");
+            throw new QuizUseException("token expired, logout forzato");
         } catch (AppException e) {
-            throw new QuizServiceException("Error getting quizzes");
+            throw new QuizUseException("Error getting quizzes");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new QuizUseException("Error getting quiz");
         }
     }
 
@@ -173,9 +176,12 @@ public class QuizUserMenager {
             else
                 return null;
         } catch (TokenExpiredException e) {
-            throw new QuizServiceException("token expired, logout forzato");
+            throw new QuizUseException("token expired, logout forzato");
         } catch (AppException e) {
-            throw new QuizServiceException("Error getting quizzes");
+            throw new QuizUseException("Error start quizzes");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new QuizUseException("Error start quiz");
         }
     }
 
@@ -210,9 +216,12 @@ public class QuizUserMenager {
                 return null;
         } catch (TokenExpiredException e) {
             e.printStackTrace();
-            throw new QuizServiceException("token expired, logout forzato");
+            throw new QuizUseException("token expired, logout forzato");
         } catch (AppException e) {
-            throw new QuizServiceException("Error getting quizzes");
+            throw new QuizUseException("Error start quizzes");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new QuizUseException("Error start quiz");
         }
     }
 
@@ -247,10 +256,13 @@ public class QuizUserMenager {
             return punteggio;
 
         } catch (TokenExpiredException e) {
-            throw new QuizServiceException("token expired, logout forzato");
+            throw new QuizUseException("token expired, logout forzato");
         } catch (AppException e) {
             e.printStackTrace();
-            throw new QuizServiceException("Error getting quizzes");
+            throw new QuizUseException("Error complete quizzes");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new QuizUseException("Error complete quizzes");
         }
     }
 }
