@@ -24,4 +24,4 @@ hs_err_pid*
 replay_pid*
 
 # Persistence locale (NON versionato)
-src/main/resources/META-INF/persistence.xml
+Server/src/main/resources/META-INF/persistence.xml

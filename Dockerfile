@@ -7,12 +7,12 @@ COPY pom.xml .
 RUN mvn -B dependency:resolve
 
 # 2. Copia tutti i sorgenti
-COPY src ./src
+COPY Server/src ./src
 
 # 3. SOSTITUZIONE FORZATA:
 # Prendiamo il file dal tuo PC e lo sovrascriviamo nel container.
 # Il primo percorso è relativo alla cartella dove si trova il Dockerfile sul tuo PC.
-COPY src/main/resources/META-INF/persistence.xml src/main/resources/META-INF/persistence.xml
+COPY Server/src/main/resources/META-INF/persistence.xml src/main/resources/META-INF/persistence.xml
 
 # 4. Build del file WAR
 RUN mvn -B clean package -DskipTests
