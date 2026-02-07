@@ -1,0 +1,18 @@
+appId: com.example.quizzy
+---
+- launchApp:
+    clearState: false
+
+- tapOn:
+    id: "username"
+- inputText: " "
+
+- tapOn:
+    id: "password"
+- inputText: "Bombo99!"
+
+- tapOn: 
+    id: "login_link"
+
+
+- assertVisible: "Inserire le credenziali per procedere"

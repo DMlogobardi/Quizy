@@ -1,0 +1,29 @@
+appId: com.example.quizzy
+---
+- launchApp:
+    clearState: false
+
+- tapOn: "Register now"
+
+- tapOn:
+    id: "et_nome"
+- inputText: " "
+
+- tapOn:
+    id: "et_cognome"
+- inputText: "Rossi"
+
+- tapOn:
+    id: "et_new_username"
+- inputText: "mario_rossi"
+
+- tapOn:
+    id: "et_new_password"
+- inputText: "Password123!"
+
+- hideKeyboard
+
+- tapOn:
+    id: "link_register"
+
+- assertVisible: "Tutti i campi sono obbligatori"

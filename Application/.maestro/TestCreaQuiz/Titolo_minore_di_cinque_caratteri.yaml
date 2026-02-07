@@ -1,0 +1,86 @@
+appId: com.example.quizzy
+---
+- launchApp:
+    clearState: false
+
+- tapOn:
+    id: "username"
+- inputText: "Fo99"
+
+- tapOn:
+    id: "password"
+- inputText: "Filippo99!"
+
+- tapOn:
+    id: "login_link"
+
+- tapOn:
+    id: "menu_icon"
+
+- tapOn: "Cambio ruolo"
+
+- tapOn: "Crea Nuovo Quiz"
+
+- tapOn:
+    id: "edit_text_titolo_quiz"
+- inputText: "Ho"
+
+- tapOn:
+    id: "edit_text_descrizione_quiz"
+- inputText: "Un quiz di prova creato con Maestro"
+
+- tapOn:
+    id: "edit_text_difficolta_quiz"
+- inputText: "Media"
+
+- tapOn:
+    id: "edit_text_tempo_quiz"
+- inputText: "10"
+
+- tapOn:
+    id: "edit_text_password_quiz"
+- inputText: "secret123"
+
+- scroll
+
+- tapOn:
+    id: "button_aggiungi_domanda"
+
+- scroll
+- tapOn:
+    id: "edit_text_quesito"
+- inputText: "Prova 1"
+
+- tapOn:
+    id: "edit_text_punti_corretta"
+- inputText: "2"
+
+- tapOn:
+    id: "edit_text_punti_sbagliata"
+- inputText: "1"
+
+- tapOn:
+    text: "Testo della Risposta"
+    index: 0
+- inputText: "prova1"
+- tapOn: Corretta
+
+- tapOn:
+    id: "button_aggiungi_risposta"
+
+- swipe:
+    start: 50%, 50%
+    end: 50%, 49%
+    duration: 2000
+
+- tapOn:
+    text: "Testo della Risposta"
+    index: 1
+- inputText: "prova2"
+
+- hideKeyboard
+
+- tapOn:
+    id: "button_salva_quiz"
+
+- assertVisible: "Titolo non valido (5-20 caratteri)"

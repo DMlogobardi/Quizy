@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Quizzy</string>
+
+    <string-array name="difficolta_array">
+        <item>Facile</item>
+        <item>Media</item>
+        <item>Difficile</item>
+    </string-array>
+</resources>

@@ -1,0 +1,24 @@
+appId: com.example.quizzy
+---
+- launchApp:
+    clearState: false
+
+
+- tapOn:
+    id: "username"
+- inputText: "Bo99"
+
+- tapOn:
+    id: "password"
+- inputText: "Bombo99!"
+
+- tapOn:
+    id: "login_link"
+
+- tapOn:
+    id: "menu_icon"
+
+- tapOn: "Cambio ruolo"
+
+- assertVisible: "Errore: 401"
+
